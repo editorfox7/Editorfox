@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- =========================
+       SEO META
+  ========================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Free Online Image Resizer – Bulk Resize JPG, PNG, WEBP for SEO & Web Performance</title>
+  <meta name="description" content="Resize images online instantly. Bulk image resizer for JPG, PNG, WEBP. 100% client-side, privacy-first, ultra-fast image resizing for SEO and web performance." />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Next-Gen Image Resizer – Resize Images Online for Web & SEO" />
+  <meta property="og:description" content="Fast, privacy-first bulk image resizer. Resize JPG, PNG, WEBP online with live preview and ZIP download." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Premium Image Tools" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- =========================
+       STYLES
+  ========================== -->
+  <style>
+    :root {
+      --bg: #0b0b0d;
+      --card: rgba(255,255,255,0.08);
+      --card-border: rgba(255,255,255,0.15);
+      --text: #f5f5f7;
+      --muted: #b3b3b8;
+      --accent: #ffffff;
+      --glow: rgba(255,255,255,0.35);
+      --success: #4ade80;
+      --error: #f87171;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #1c1c1f, transparent),
+                  radial-gradient(800px 400px at 90% 10%, #16161a, transparent),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 32px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      max-width: 720px;
+      margin: 12px auto 0;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+      margin-bottom: 24px;
+    }
+
+    .card:hover {
+      box-shadow: 0 25px 60px rgba(0,0,0,0.65);
+    }
+
+    /* Upload */
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,0.25);
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.05);
+    }
+
+    .upload-zone input {
+      display: none;
+    }
+
+    .upload-zone strong {
+      display: block;
+      font-size: 1.1rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(0,0,0,0.4);
+      color: var(--text);
+      outline: none;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.1);
+    }
+
+    button {
+      background: linear-gradient(180deg, #ffffff, #dcdcdc);
+      color: #000;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(255,255,255,0.25);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    /* Preview Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .image-card {
+      background: rgba(0,0,0,0.45);
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .image-card img {
+      max-width: 100%;
+      border-radius: 10px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .stats {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* SEO Article */
+    article {
+      max-width: 900px;
+      margin: 80px auto 40px;
+      padding: 0 20px;
+    }
+
+    article h2, article h3 {
+      font-family: 'Poppins', sans-serif;
+      margin-top: 40px;
+    }
+
+    article p {
+      margin: 14px 0;
+      color: #e6e6e8;
+    }
+
+    article ul {
+      margin-left: 20px;
+    }
+
+    /* Accessibility */
+    button:focus, input:focus, select:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 600px) {
+      header p { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>Next-Gen Image Resizer</h1>
+  <p>Resize images online instantly. Bulk-friendly, privacy-first, and optimized for web performance & SEO.</p>
+</header>
+
+<main>
+  <!-- Upload -->
+  <section class="card">
+    <div class="upload-zone" id="uploadZone" aria-label="Upload images" role="button" tabindex="0">
+      <strong>Drag & Drop Images</strong>
+      <span>or click to upload (JPG, PNG, WEBP)</span>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple />
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div>
+        <label>Width (px)</label>
+        <input type="number" id="widthInput" placeholder="Auto" />
+      </div>
+      <div>
+        <label>Height (px)</label>
+        <input type="number" id="heightInput" placeholder="Auto" />
+      </div>
+      <div>
+        <label>Scale (%)</label>
+        <input type="number" id="scaleInput" value="100" />
+      </div>
+      <div>
+        <label>
+          <input type="checkbox" id="lockRatio" checked />
+          Lock aspect ratio
+        </label>
+      </div>
+      <div>
+        <label>Preset</label>
+        <select id="presetSelect">
+          <option value="">Custom</option>
+          <option value="1080x1080">Instagram Square</option>
+          <option value="1200x628">Facebook Post</option>
+          <option value="1200x675">Twitter / X</option>
+          <option value="1200x627">LinkedIn</option>
+          <option value="800x450">Blog Image</option>
+          <option value="150x150">Thumbnail</option>
+          <option value="1920x1080">Hero Banner</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="resizeBtn">Resize Images</button>
+      <button id="downloadAllBtn">Download ZIP</button>
+    </div>
+  </section>
+
+  <!-- Preview -->
+  <section class="card">
+    <h2 style="margin-top:0;">Live Preview</h2>
+    <div class="grid" id="previewGrid"></div>
+  </section>
+</main>
+
+<footer>
+  © 2025 Premium Image Tools · Privacy-First · Client-Side Only
+</footer>
+
+<!-- =========================
+     SCRIPT
+========================== -->
+<script>
+/* Analytics Hooks (commented)
+function track(event, data) {
+  // gtag('event', event, data);
+  // plausible(event, { props: data });
+}
+*/
+
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const previewGrid = document.getElementById('previewGrid');
+const resizeBtn = document.getElementById('resizeBtn');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
+
+const widthInput = document.getElementById('widthInput');
+const heightInput = document.getElementById('heightInput');
+const scaleInput = document.getElementById('scaleInput');
+const lockRatio = document.getElementById('lockRatio');
+const presetSelect = document.getElementById('presetSelect');
+
+let images = [];
+
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); });
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  handleFiles(e.dataTransfer.files);
+});
+
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+presetSelect.addEventListener('change', () => {
+  if (!presetSelect.value) return;
+  const [w, h] = presetSelect.value.split('x');
+  widthInput.value = w;
+  heightInput.value = h;
+});
+
+function handleFiles(files) {
+  [...files].forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        images.push({ file, img, resizedBlob: null });
+        render();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  // track('upload', { count: files.length });
+}
+
+function render() {
+  previewGrid.innerHTML = '';
+  images.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = 'image-card';
+
+    const img = document.createElement('img');
+    img.src = item.resizedBlob ? URL.createObjectURL(item.resizedBlob) : item.img.src;
+
+    const stats = document.createElement('div');
+    stats.className = 'stats';
+    stats.textContent = `${item.img.width}×${item.img.height}px`;
+
+    const btn = document.createElement('button');
+    btn.textContent = 'Download';
+    btn.onclick = () => downloadBlob(item.resizedBlob || item.file, item.file.name);
+
+    card.appendChild(img);
+    card.appendChild(stats);
+    card.appendChild(btn);
+    previewGrid.appendChild(card);
+  });
+}
+
+resizeBtn.addEventListener('click', () => {
+  images.forEach(item => {
+    const canvas = document.createElement('canvas');
+    let w = widthInput.value ? parseInt(widthInput.value) : item.img.width;
+    let h = heightInput.value ? parseInt(heightInput.value) : item.img.height;
+
+    if (scaleInput.value && scaleInput.value !== '100') {
+      const scale = parseInt(scaleInput.value) / 100;
+      w = Math.round(item.img.width * scale);
+      h = Math.round(item.img.height * scale);
+    }
+
+    if (lockRatio.checked && widthInput.value && !heightInput.value) {
+      h = Math.round((w / item.img.width) * item.img.height);
+    }
+
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(item.img, 0, 0, w, h);
+
+    canvas.toBlob(blob => {
+      item.resizedBlob = blob;
+      render();
+    }, item.file.type || 'image/jpeg', 0.95);
+  });
+  // track('resize', { count: images.length });
+});
+
+function downloadBlob(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  // track('download', { single: true });
+}
+
+/* Minimal ZIP writer (store method) */
+downloadAllBtn.addEventListener('click', () => {
+  if (!images.length) return;
+  const files = images.map((img, i) => ({
+    name: img.file.name,
+    blob: img.resizedBlob || img.file
+  }));
+  createZip(files);
+  // track('download', { zip: true });
+});
+
+function createZip(files) {
+  let offset = 0;
+  const records = [];
+  const central = [];
+
+  Promise.all(files.map(f => f.blob.arrayBuffer())).then(buffers => {
+    buffers.forEach((buffer, i) => {
+      const data = new Uint8Array(buffer);
+      const name = files[i].name;
+      const header = new Uint8Array(30 + name.length);
+      const view = new DataView(header.buffer);
+
+      view.setUint32(0, 0x04034b50, true);
+      view.setUint16(8, 0, true);
+      view.setUint16(10, 0, true);
+      view.setUint32(18, data.length, true);
+      view.setUint32(22, data.length, true);
+      view.setUint16(26, name.length, true);
+
+      for (let j = 0; j < name.length; j++) header[30 + j] = name.charCodeAt(j);
+
+      records.push(header, data);
+
+      const c = new Uint8Array(46 + name.length);
+      const cv = new DataView(c.buffer);
+      cv.setUint32(0, 0x02014b50, true);
+      cv.setUint32(20, data.length, true);
+      cv.setUint32(24, data.length, true);
+      cv.setUint16(28, name.length, true);
+      cv.setUint32(42, offset, true);
+
+      for (let j = 0; j < name.length; j++) c[46 + j] = name.charCodeAt(j);
+
+      central.push(c);
+      offset += header.length + data.length;
+    });
+
+    const end = new Uint8Array(22);
+    const ev = new DataView(end.buffer);
+    ev.setUint32(0, 0x06054b50, true);
+    ev.setUint16(8, files.length, true);
+    ev.setUint16(10, files.length, true);
+    ev.setUint32(12, central.reduce((s, a) => s + a.length, 0), true);
+    ev.setUint32(16, offset, true);
+
+    const zip = new Blob([...records, ...central, end], { type: 'application/zip' });
+    downloadBlob(zip, 'resized-images.zip');
+  });
+}
+
+/* Service Worker Hook (commented)
+if ('serviceWorker' in navigator) {
+  // navigator.serviceWorker.register('/sw.js');
+}
+*/
+</script>
+
+<!-- =========================
+     SEO ARTICLE
+========================== -->
+<article>
+<h1>Image Resizer: Resize Images Online for Speed, SEO, and Performance</h1>
+
+<p>An image resizer is one of the most essential tools in modern web optimization. Whether you are managing a website, running an online store, publishing blog content, or preparing images for social media, resizing images correctly has a direct impact on page speed, search engine rankings, and user experience.</p>
+
+<p>This free image resizer allows you to resize images online instantly, directly in your browser. There are no uploads to a server, no tracking pixels, and no compromises on quality. Everything happens on your device, making it one of the fastest and most privacy-friendly image resizing tools available.</p>
+
+<h2>What Is Image Resizing?</h2>
+
+<p>Image resizing is the process of changing the dimensions of an image by adjusting its width and height. When you resize an image, you control how many pixels it contains, which directly affects its visual size and file weight.</p>
+
+<p>Resizing images is different from simply scaling them in CSS. True image resizing permanently changes the pixel dimensions of the image file itself, making it lighter and more efficient for web delivery.</p>
+
+<h2>How Image Resizing Works</h2>
+
+<p>Modern image resizing tools use rendering engines to redraw an image at a new resolution. In this image resizer, the HTML Canvas API is used to re-render each image at the exact dimensions you choose.</p>
+
+<ul>
+  <li>The original image is loaded into memory</li>
+  <li>New width and height values are calculated</li>
+  <li>The image is redrawn pixel-by-pixel</li>
+  <li>A new optimized image file is generated</li>
+</ul>
+
+<p>Because this happens entirely on the client side, resizing is instant and secure.</p>
+
+<h2>Image Resizing vs Image Compression</h2>
+
+<p>Image resizing and image compression are often confused, but they serve different purposes.</p>
+
+<p><strong>Image resizing</strong> changes the physical dimensions of an image. A 4000×3000 photo resized to 1200×900 contains far fewer pixels and is significantly lighter.</p>
+
+<p><strong>Image compression</strong> reduces file size by optimizing how image data is stored, often by removing invisible information.</p>
+
+<p>The best results come from combining both. Resize images to the exact dimensions you need, then apply smart compression. This image resizer focuses on precise dimension control, which is the most impactful first step in image size optimization.</p>
+
+<h2>Why Resizing Images Matters for SEO</h2>
+
+<p>Search engines prioritize fast websites. Large, unoptimized images are one of the most common causes of slow page loading times.</p>
+
+<p>By resizing images properly, you:</p>
+
+<ul>
+  <li>Reduce page weight</li>
+  <li>Improve Core Web Vitals</li>
+  <li>Decrease bounce rates</li>
+  <li>Improve mobile performance</li>
+  <li>Enhance overall SEO signals</li>
+</ul>
+
+<p>Google explicitly recommends optimizing images as part of website image optimization strategies. A fast-loading page provides a better user experience and ranks higher in search results.</p>
+
+<h2>Image Dimensions and Website Performance</h2>
+
+<p>Serving images larger than necessary wastes bandwidth and processing power. For example, uploading a 5000px wide image to display in a 1200px container forces browsers to download unnecessary data.</p>
+
+<p>Using an online image resizer ensures every image matches its display size perfectly. This reduces network requests, improves rendering speed, and delivers a smoother browsing experience on all devices.</p>
+
+<h2>Client-Side vs Server-Side Image Resizing</h2>
+
+<p>Server-side image resizing requires uploading files to a remote server, processing them, and downloading the results. While effective, this approach raises privacy concerns and introduces latency.</p>
+
+<p>Client-side image resizing, like this tool, offers several advantages:</p>
+
+<ul>
+  <li>No image uploads</li>
+  <li>Instant processing</li>
+  <li>Better privacy</li>
+  <li>Lower infrastructure costs</li>
+  <li>Offline-friendly capability</li>
+</ul>
+
+<p>Because everything happens in your browser, your images never leave your device.</p>
+
+<h2>Best Practices for Resizing Images for Web</h2>
+
+<p>To get the best results when resizing images for the web, follow these best practices:</p>
+
+<ul>
+  <li>Resize images to exact display dimensions</li>
+  <li>Use modern formats like WEBP when possible</li>
+  <li>Maintain aspect ratio to avoid distortion</li>
+  <li>Avoid extreme upscaling</li>
+  <li>Batch process images for consistency</li>
+</ul>
+
+<p>This bulk image resizer makes it easy to apply one resize setting across multiple images, saving time and ensuring uniform results.</p>
+
+<h2>How This Image Resizer Improves Speed and Rankings</h2>
+
+<p>This free image resizer is designed with performance and SEO in mind. It produces lightweight images, reduces layout shifts, and helps pages load faster across all devices.</p>
+
+<p>By resizing images online before uploading them to your website, you directly improve your site’s performance metrics and search visibility.</p>
+
+<h2>Frequently Asked Questions</h2>
+
+<h3>Is this image resizer free to use?</h3>
+<p>Yes. This is a free image resizer that works entirely in your browser with no limits on usage.</p>
+
+<h3>Can I resize images in bulk?</h3>
+<p>Yes. You can resize multiple images at once and download them individually or as a ZIP file.</p>
+
+<h3>Does this tool support JPG, PNG, and WEBP?</h3>
+<p>Yes. You can resize JPG, PNG, and WEBP images easily.</p>
+
+<h3>Are my images uploaded to a server?</h3>
+<p>No. All image resizing is done client-side for maximum privacy.</p>
+
+<h3>Is this image resizer good for SEO?</h3>
+<p>Absolutely. Resizing images for web performance is a key part of image resizer for SEO strategies.</p>
+</article>
+</body>
+</html>
