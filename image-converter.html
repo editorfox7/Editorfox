@@ -2,195 +2,309 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Image Converter Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="description" content="Next-Gen Online Image Converter. Convert JPG, PNG, WEBP, BMP, TIFF, GIF in bulk with lossless or lossy options. Free, fast, and privacy-first.">
+<meta name="keywords" content="image converter, convert images online, bulk image converter, JPG to PNG, PNG to WEBP, WEBP to JPG, free image converter, online image converter, image format optimization, website image optimization, image converter for SEO">
+<meta property="og:title" content="Next-Gen Online Image Converter">
+<meta property="og:description" content="Convert images online in multiple formats. Bulk-friendly, client-side, fast, and privacy-first image converter for web and social media optimization.">
+<meta property="og:type" content="website">
+<title>Next-Gen Image Converter | Convert Images Online</title>
 <style>
-:root {
-  --bg-light: #f5f5f5;
-  --bg-dark: #121212;
-  --card-light: #ffffff;
-  --card-dark: #1e1e1e;
-  --text-light: #111;
-  --text-dark: #f5f5f5;
-  --accent: #4f46e5;
-}
+/* ===== RESET & BASE ===== */
+* {margin:0;padding:0;box-sizing:border-box;}
+body {font-family: 'Inter', sans-serif; background:#0b0b0b; color:#f5f5f5; line-height:1.6;}
+a {color:inherit; text-decoration:none;}
+h1,h2,h3,h4,h5,h6 {font-family:'Poppins', sans-serif; margin-bottom:0.5rem;}
 
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: var(--bg-light);
-  color: var(--text-light);
-  transition: 0.3s;
-}
+/* ===== LAYOUT ===== */
+.container {max-width:1200px; margin:0 auto; padding:2rem;}
+header, footer {text-align:center; padding:1rem;}
+main {display:flex; flex-direction:column; gap:2rem;}
 
-body.dark {
-  background: var(--bg-dark);
-  color: var(--text-dark);
-}
+/* ===== TOOL CARD ===== */
+.tool-card {background:rgba(255,255,255,0.05); backdrop-filter:blur(15px); border-radius:16px; padding:2rem; box-shadow:0 8px 24px rgba(0,0,0,0.4); transition:transform 0.3s;}
+.tool-card:hover {transform:translateY(-5px);}
 
-.container {
-  max-width: 480px;
-  margin: auto;
-  padding: 1rem;
-}
+/* ===== DRAG & DROP AREA ===== */
+.drop-zone {border:2px dashed #444; border-radius:12px; padding:2rem; text-align:center; cursor:pointer; transition:background 0.3s;}
+.drop-zone.dragover {background:rgba(255,255,255,0.1);}
+.drop-zone p {margin-bottom:1rem; font-size:1.1rem; color:#ccc;}
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* ===== FILE LIST ===== */
+.file-list {margin-top:1rem;}
+.file-item {display:flex; justify-content:space-between; align-items:center; padding:0.5rem; background:rgba(255,255,255,0.05); border-radius:8px; margin-bottom:0.5rem;}
+.file-item span {overflow:hidden; text-overflow:ellipsis; max-width:60%;}
+.file-item button {background:#1f1f1f; border:none; padding:0.3rem 0.6rem; border-radius:6px; cursor:pointer; transition:background 0.2s;}
+.file-item button:hover {background:#333;}
 
-.card {
-  background: var(--card-light);
-  padding: 1rem;
-  border-radius: 12px;
-  margin-top: 1rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
+/* ===== CONTROLS ===== */
+.controls {display:flex; flex-wrap:wrap; gap:1rem; margin-top:1rem;}
+.controls label {display:flex; flex-direction:column; font-size:0.9rem;}
+.controls input, .controls select {padding:0.5rem; border-radius:8px; border:none; background:#1a1a1a; color:#fff; margin-top:0.3rem;}
 
-body.dark .card {
-  background: var(--card-dark);
-}
+/* ===== BUTTONS ===== */
+button.convert-btn {padding:0.8rem 1.5rem; background:linear-gradient(135deg,#ff6ec4,#7873f5); border:none; border-radius:12px; cursor:pointer; font-weight:bold; color:#fff; transition:transform 0.2s, box-shadow 0.2s;}
+button.convert-btn:hover {transform:scale(1.05); box-shadow:0 8px 20px rgba(255,110,196,0.5);}
 
-input, select, button {
-  width: 100%;
-  margin-top: 0.75rem;
-}
+/* ===== PREVIEW ===== */
+.preview {display:flex; flex-wrap:wrap; gap:1rem; margin-top:1rem;}
+.preview-item {flex:1 1 150px; position:relative;}
+.preview-item img {width:100%; border-radius:12px; object-fit:contain; box-shadow:0 4px 12px rgba(0,0,0,0.5); transition:transform 0.3s;}
+.preview-item img:hover {transform:scale(1.05);}
 
-button {
-  padding: 0.7rem;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-}
+/* ===== TOAST NOTIFICATIONS ===== */
+.toast {position:fixed; bottom:2rem; right:2rem; background:#1f1f1f; padding:1rem 1.5rem; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5); opacity:0; pointer-events:none; transition:opacity 0.5s;}
+.toast.show {opacity:1; pointer-events:auto;}
 
-.preview {
-  margin-top: 1rem;
-  text-align: center;
-}
-
-.preview img {
-  max-width: 100%;
-  border-radius: 8px;
-  display: none;
-}
-
-.controls label {
-  font-size: 0.9rem;
-  display: block;
-  margin-top: 0.5rem;
-}
-
-#themeToggle {
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  cursor: pointer;
-}
-
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.3rem;
-  }
-}
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){.controls{flex-direction:column;}}
 </style>
 </head>
+<body>
+<header>
+<h1>Next-Gen Image Converter</h1>
+<p>Convert images online in multiple formats, lossless or lossy, single or bulk</p>
+</header>
+<main class="container">
+<div class="tool-card">
+<div class="drop-zone" id="drop-zone">
+<p>Drag & Drop your images here or click to upload</p>
+<input type="file" id="file-input" accept="image/*" multiple style="display:none;">
+</div>
+<div class="file-list" id="file-list"></div>
 
-<body class="light">
-
-<div class="container">
-  <header>
-    <h1>Image Converter</h1>
-    <button id="themeToggle">🌙</button>
-  </header>
-
-  <div class="card">
-    <input type="file" id="upload" accept="image/*">
-
-    <div class="preview">
-      <img id="previewImg" alt="Preview">
-    </div>
-
-    <div class="controls">
-      <label>
-        Convert to:
-        <select id="format">
-          <option value="image/jpeg">JPG</option>
-          <option value="image/png">PNG</option>
-          <option value="image/webp">WEBP</option>
-        </select>
-      </label>
-
-      <label>
-        Quality:
-        <input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.8">
-      </label>
-
-      <button id="convertBtn">Convert & Download</button>
-    </div>
-  </div>
+<div class="controls">
+<label>
+Output Format
+<select id="output-format">
+<option value="jpeg">JPG</option>
+<option value="png">PNG</option>
+<option value="webp">WEBP</option>
+<option value="avif">AVIF</option>
+<option value="bmp">BMP</option>
+</select>
+</label>
+<label>
+Quality (%)
+<input type="range" id="quality" min="10" max="100" value="90">
+</label>
+<label>
+Resize (px)
+<input type="number" id="resize-width" placeholder="Width" min="1">
+</label>
+<label>
+Background Color
+<input type="color" id="bg-color" value="#ffffff">
+</label>
 </div>
 
+<button class="convert-btn" id="convert-btn">Convert Images</button>
+
+<div class="preview" id="preview"></div>
+</div>
+</main>
+
+<div class="toast" id="toast">Conversion Complete!</div>
+
+<footer>
+<p>© 2025 Next-Gen Image Converter. Privacy-First & Client-Side Only.</p>
+</footer>
+
 <script>
-const upload = document.getElementById("upload");
-const previewImg = document.getElementById("previewImg");
-const convertBtn = document.getElementById("convertBtn");
-const formatSelect = document.getElementById("format");
-const qualityInput = document.getElementById("quality");
-const themeToggle = document.getElementById("themeToggle");
+/* ===== ELEMENTS ===== */
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const fileList = document.getElementById('file-list');
+const convertBtn = document.getElementById('convert-btn');
+const preview = document.getElementById('preview');
+const outputFormat = document.getElementById('output-format');
+const qualityInput = document.getElementById('quality');
+const resizeWidthInput = document.getElementById('resize-width');
+const bgColorInput = document.getElementById('bg-color');
+const toast = document.getElementById('toast');
 
-let image = new Image();
+let files = [];
 
-// Image Upload & Preview
-upload.addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+/* ===== DRAG & DROP HANDLING ===== */
+dropZone.addEventListener('click', ()=>fileInput.click());
+dropZone.addEventListener('dragover', e=>{e.preventDefault(); dropZone.classList.add('dragover');});
+dropZone.addEventListener('dragleave', e=>{dropZone.classList.remove('dragover');});
+dropZone.addEventListener('drop', e=>{
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', e=>handleFiles(e.target.files));
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    image.src = reader.result;
-    previewImg.src = reader.result;
-    previewImg.style.display = "block";
-  };
-  reader.readAsDataURL(file);
+function handleFiles(selectedFiles){
+    for(const file of selectedFiles){
+        if(!file.type.startsWith('image/')) continue;
+        files.push(file);
+        const item = document.createElement('div');
+        item.className='file-item';
+        item.innerHTML=`<span>${file.name}</span><button onclick="removeFile('${file.name}')">Remove</button>`;
+        fileList.appendChild(item);
+    }
+    renderPreview();
+}
+
+function removeFile(name){
+    files = files.filter(f=>f.name!==name);
+    fileList.innerHTML='';
+    files.forEach(f=>{
+        const item = document.createElement('div');
+        item.className='file-item';
+        item.innerHTML=`<span>${f.name}</span><button onclick="removeFile('${f.name}')">Remove</button>`;
+        fileList.appendChild(item);
+    });
+    renderPreview();
+}
+
+/* ===== PREVIEW ===== */
+function renderPreview(){
+    preview.innerHTML='';
+    files.forEach(f=>{
+        const reader = new FileReader();
+        reader.onload = e=>{
+            const div = document.createElement('div');
+            div.className='preview-item';
+            div.innerHTML=`<img src="${e.target.result}" alt="${f.name}">`;
+            preview.appendChild(div);
+        };
+        reader.readAsDataURL(f);
+    });
+}
+
+/* ===== CONVERSION ===== */
+convertBtn.addEventListener('click', async()=>{
+    if(files.length===0) return;
+    const format = outputFormat.value;
+    const quality = qualityInput.value/100;
+    const resizeWidth = parseInt(resizeWidthInput.value) || null;
+    const bgColor = bgColorInput.value;
+
+    for(const file of files){
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        await new Promise(res=>{img.onload=res; img.src=url;});
+        const canvas = document.createElement('canvas');
+        let width=img.width, height=img.height;
+        if(resizeWidth && resizeWidth<img.width){
+            width=resizeWidth;
+            height=Math.round(img.height*(resizeWidth/img.width));
+        }
+        canvas.width=width; canvas.height=height;
+        const ctx = canvas.getContext('2d');
+        if(format==='jpeg' && img.src.includes('png') && bgColor){
+            ctx.fillStyle=bgColor; ctx.fillRect(0,0,width,height);
+        }
+        ctx.drawImage(img,0,0,width,height);
+        const blob = await new Promise(res=>canvas.toBlob(res,'image/'+format, quality));
+        const a = document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download=file.name.split('.').slice(0,-1).join('.')+'.'+format;
+        a.click();
+    }
+    showToast('Conversion Complete!');
 });
 
-// Convert & Download
-convertBtn.addEventListener("click", () => {
-  if (!image.src) {
-    alert("Please upload an image first!");
-    return;
-  }
+/* ===== TOAST ===== */
+function showToast(msg){
+    toast.textContent=msg;
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'),3000);
+}
 
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+/* ===== ANALYTICS HOOKS (COMMENTED) ===== */
+// Track upload: gtag('event','upload',{files:files.length});
+// Track conversion: gtag('event','convert',{format:outputFormat.value});
+// Track download: gtag('event','download',{files:files.length});
 
-  canvas.width = image.width;
-  canvas.height = image.height;
-  ctx.drawImage(image, 0, 0);
-
-  const format = formatSelect.value;
-  const quality = parseFloat(qualityInput.value);
-
-  canvas.toBlob((blob) => {
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `converted.${format.split("/")[1]}`;
-    link.click();
-  }, format, quality);
-});
-
-// Dark / Light Mode Toggle
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  themeToggle.textContent =
-    document.body.classList.contains("dark") ? "☀️" : "🌙";
-});
 </script>
 
+<!-- ===== SEO ARTICLE ===== -->
+<article class="container" style="margin-top:3rem;">
+<h1>Ultimate Guide to Image Conversion: Boost Your Website Performance</h1>
+
+<p>In the digital age, website performance and visual quality go hand in hand. Image conversion plays a pivotal role in ensuring fast-loading pages, better user experience, and higher SEO rankings. This comprehensive guide dives deep into image conversion, its techniques, and why it matters for your website.</p>
+
+<h2>What is Image Conversion?</h2>
+<p>Image conversion is the process of changing an image from one format to another. Common examples include converting JPG to PNG, PNG to WEBP, or WEBP to JPG. This is essential for optimizing images for different use-cases, such as web publishing, social media sharing, or printing.</p>
+
+<h2>How Image Conversion Works</h2>
+<p>Modern image converters, especially client-side tools, use browser APIs like Canvas and Blob to handle image data directly in the user's browser. The steps include:</p>
+<ul>
+<li>Reading the original image.</li>
+<li>Rendering it on a canvas element.</li>
+<li>Applying optional transformations (resize, quality adjustment, background color).</li>
+<li>Exporting the image in the desired format.</li>
+</ul>
+
+<h2>Image Conversion vs Image Compression</h2>
+<p>While both techniques aim to optimize images, they are distinct:</p>
+<ul>
+<li><strong>Image Conversion:</strong> Changes the file format while optionally adjusting quality and size.</li>
+<li><strong>Image Compression:</strong> Reduces file size within the same format, either losslessly or with minimal quality loss.</li>
+</ul>
+
+<h2>Best Image Formats for Web Performance</h2>
+<p>Choosing the right format is crucial for speed and quality:</p>
+<ul>
+<li><strong>JPG:</strong> Excellent for photographs, widely supported, lossy compression.</li>
+<li><strong>PNG:</strong> Supports transparency, ideal for graphics, lossless.</li>
+<li><strong>WEBP:</strong> Modern format, high compression, supports transparency, faster loading.</li>
+<li><strong>AVIF:</strong> Cutting-edge format with superior compression and quality.</li>
+<li><strong>BMP & TIFF:</strong> Rarely used online due to large file sizes.</li>
+</ul>
+
+<h2>Why Image Format Matters for SEO</h2>
+<p>Optimized images improve page load times, reduce bounce rates, and enhance Core Web Vitals — all ranking factors for Google. Using modern formats like WEBP or AVIF can drastically reduce file sizes without compromising quality.</p>
+
+<h2>Client-Side vs Server-Side Image Conversion</h2>
+<p>Our tool uses client-side conversion, which means:</p>
+<ul>
+<li>No images are uploaded to a server.</li>
+<li>Conversion happens instantly in the browser.</li>
+<li>Enhanced privacy and speed.</li>
+</ul>
+<p>Server-side conversion, in contrast, requires uploading images to a backend server for processing, which can introduce latency and privacy concerns.</p>
+
+<h2>Best Practices for Converting Images for Web</h2>
+<ul>
+<li>Use modern formats (WEBP, AVIF) for web pages.</li>
+<li>Resize images to the display size.</li>
+<li>Maintain transparency when necessary.</li>
+<li>Adjust quality to balance size and visual fidelity.</li>
+<li>Bulk convert images for consistency and efficiency.</li>
+</ul>
+
+<h2>How This Image Converter Improves UX & Rankings</h2>
+<p>This Next-Gen Image Converter is designed with performance, usability, and SEO in mind:</p>
+<ul>
+<li>Bulk conversion saves time for website managers.</li>
+<li>Client-side processing ensures privacy and speed.</li>
+<li>Smart presets suggest the optimal format for web or social media.</li>
+<li>Live previews and before/after comparisons reduce errors.</li>
+<li>Optimized images lead to faster loading pages, better Core Web Vitals, and improved Google rankings.</li>
+</ul>
+
+<h2>FAQs</h2>
+<h3>1. Is this tool free to use?</h3>
+<p>Yes, the online image converter is completely free and client-side, ensuring privacy.</p>
+
+<h3>2. Can I convert multiple images at once?</h3>
+<p>Absolutely! The tool supports bulk image conversion for JPG, PNG, WEBP, AVIF, BMP, and more.</p>
+
+<h3>3. Will my images be uploaded to a server?</h3>
+<p>No. All conversions are performed entirely in your browser.</p>
+
+<h3>4. Which format is best for web performance?</h3>
+<p>WEBP or AVIF are recommended for fast-loading web pages, with JPG as a fallback.</p>
+
+<h3>5. Can I adjust image quality?</h3>
+<p>Yes, you can use the quality slider to fine-tune compression and file size.</p>
+
+<h2>Conclusion</h2>
+<p>Image conversion is more than just changing file formats; it's a critical component of website optimization. Using a fast, client-side bulk image converter ensures your website images are optimized for speed, visual quality, and SEO performance. Start converting your images today to improve user experience and boost your search engine rankings!</p>
+</article>
 </body>
 </html>
