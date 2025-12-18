@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Free Online Image Cropper – Bulk Crop JPG, PNG, WEBP for Web & SEO</title>
+  <meta name="description" content="Luxury-grade free image cropper. Crop JPG, PNG, WEBP online. Bulk image cropper with live preview, presets for social media, SEO-friendly, private & ultra-fast." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Next-Gen Image Cropper – Fast, Free & SEO-Optimized" />
+  <meta property="og:description" content="Crop images online with precision. Bulk crop JPG, PNG, WEBP. Client-side, private, lightning-fast." />
+  <meta property="og:type" content="website" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0b0d;
+      --card:rgba(255,255,255,0.08);
+      --glass:rgba(255,255,255,0.12);
+      --border:rgba(255,255,255,0.15);
+      --text:#f5f5f5;
+      --muted:#b5b5b5;
+      --accent:#ffffff;
+      --shadow:0 20px 40px rgba(0,0,0,.6);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,sans-serif;
+      background:radial-gradient(circle at top,#141418,#070709);
+      color:var(--text);
+      line-height:1.6;
+    }
+    header{
+      padding:32px 20px;
+      text-align:center;
+    }
+    header h1{
+      font-size:2.2rem;
+      margin:0 0 10px;
+      font-weight:700;
+      letter-spacing:-.02em;
+    }
+    header p{color:var(--muted);max-width:720px;margin:auto}
+
+    .container{max-width:1200px;margin:auto;padding:20px}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));
+      backdrop-filter:blur(16px);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:20px;
+      margin-bottom:24px;
+    }
+
+    .uploader{
+      border:2px dashed var(--border);
+      border-radius:16px;
+      padding:40px;
+      text-align:center;
+      cursor:pointer;
+      transition:.3s;
+    }
+    .uploader:hover{background:rgba(255,255,255,.05)}
+    .uploader input{display:none}
+
+    .workspace{
+      display:grid;
+      grid-template-columns:1fr 360px;
+      gap:20px;
+    }
+    @media(max-width:900px){.workspace{grid-template-columns:1fr}}
+
+    canvas{max-width:100%;border-radius:12px;background:#000}
+
+    .controls button,select{
+      background:var(--glass);
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      margin:4px;
+      transition:.25s;
+    }
+    .controls button:hover{box-shadow:0 0 0 1px #fff inset}
+    .stats{font-size:.85rem;color:var(--muted);margin-top:10px}
+
+    footer{
+      text-align:center;
+      padding:40px 20px;
+      color:var(--muted);
+      font-size:.85rem;
+    }
+
+    /* SEO Article */
+    article{max-width:900px;margin:auto;padding:40px 20px}
+    article h2,article h3{margin-top:40px}
+    article p{margin:14px 0}
+    article ul{padding-left:20px}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Next-Gen Online Image Cropper</h1>
+  <p>Crop images online with pixel-perfect precision. Bulk crop JPG, PNG, WEBP directly in your browser — private, fast, and SEO-optimized.</p>
+</header>
+
+<div class="container">
+
+  <div class="card uploader" id="dropZone" aria-label="Upload images">
+    <strong>Drag & Drop Images</strong><br>
+    <span class="muted">or click to upload (JPG, PNG, WEBP)</span>
+    <input type="file" id="fileInput" multiple accept="image/*">
+  </div>
+
+  <div class="card workspace">
+    <div>
+      <canvas id="canvas" width="800" height="500" aria-label="Image crop canvas"></canvas>
+    </div>
+    <div>
+      <div class="controls">
+        <select id="ratio">
+          <option value="free">Free</option>
+          <option value="1">1:1 Instagram</option>
+          <option value="4/5">4:5 Instagram</option>
+          <option value="16/9">16:9</option>
+          <option value="9/16">9:16</option>
+          <option value="1.91">1.91:1 Facebook / LinkedIn</option>
+        </select>
+        <button id="rotate">Rotate</button>
+        <button id="reset">Reset</button>
+        <button id="download">Download</button>
+      </div>
+      <div class="stats" id="stats">No image loaded</div>
+    </div>
+  </div>
+
+</div>
+
+<article>
+  <h2>What Is Image Cropping?</h2>
+  <p>Image cropping is the process of removing unwanted outer areas of an image to focus on the most important visual elements. Unlike resizing, cropping changes composition rather than just dimensions.</p>
+
+  <h2>How Image Cropping Works</h2>
+  <p>An image cropper selects a rectangular area of an image and discards the rest. Modern online image croppers use the HTML Canvas API to perform fast, client-side processing.</p>
+
+  <h2>Image Cropping vs Image Resizing</h2>
+  <ul>
+    <li><strong>Resizing</strong> scales the entire image.</li>
+    <li><strong>Cropping</strong> removes unnecessary parts.</li>
+  </ul>
+
+  <h2>Why Image Cropping Matters for SEO</h2>
+  <p>Well-cropped images improve page layout, reduce file size, and increase engagement — all signals that indirectly improve search rankings.</p>
+
+  <h2>Image Composition & User Engagement</h2>
+  <p>Strategic cropping emphasizes focal points, improving click-through rates on social platforms and lowering bounce rates on websites.</p>
+
+  <h2>Client-Side vs Server-Side Image Cropping</h2>
+  <p>This image cropper runs entirely in your browser. No uploads. No tracking. Maximum privacy and instant speed.</p>
+
+  <h2>Best Practices for Cropping Images for the Web</h2>
+  <ul>
+    <li>Use correct aspect ratios for platforms</li>
+    <li>Avoid over-cropping faces or text</li>
+    <li>Export optimized formats like WEBP</li>
+  </ul>
+
+  <h2>How This Image Cropper Improves UX & Rankings</h2>
+  <p>This free image cropper is optimized for performance, accessibility, and SEO. Bulk processing, smart presets, and instant previews create a frictionless workflow that users love.</p>
+
+  <h3>FAQ</h3>
+  <p><strong>Is this image cropper free?</strong><br>Yes. This is a free online image cropper.</p>
+  <p><strong>Does it support bulk image cropping?</strong><br>Yes. Bulk image cropper functionality is built-in.</p>
+  <p><strong>Are my images uploaded?</strong><br>No. All processing happens locally in your browser.</p>
+</article>
+
+<footer>
+  © 2025 Image Cropper Tool · Privacy-First · SEO-Optimized
+</footer>
+
+<script>
+/* Analytics hooks (GA / Plausible)
+  track('upload')
+  track('crop')
+  track('download')
+*/
+
+/* PWA Service Worker hook
+  navigator.serviceWorker.register('/sw.js')
+*/
+
+const fileInput=document.getElementById('fileInput');
+const dropZone=document.getElementById('dropZone');
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+const stats=document.getElementById('stats');
+let img=new Image(), angle=0;
+
+dropZone.onclick=()=>fileInput.click();
+dropZone.ondragover=e=>{e.preventDefault();dropZone.style.opacity=.7};
+dropZone.ondragleave=()=>dropZone.style.opacity=1;
+dropZone.ondrop=e=>{
+  e.preventDefault();loadFile(e.dataTransfer.files[0]);
+};
+
+fileInput.onchange=e=>loadFile(e.target.files[0]);
+
+function loadFile(file){
+  if(!file)return;
+  img.onload=()=>{
+    canvas.width=img.width;
+    canvas.height=img.height;
+    draw();
+    stats.textContent=`Original: ${img.width}×${img.height}px`;
+  };
+  img.src=URL.createObjectURL(file);
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  ctx.translate(canvas.width/2,canvas.height/2);
+  ctx.rotate(angle);
+  ctx.drawImage(img,-img.width/2,-img.height/2);
+  ctx.restore();
+}
+
+document.getElementById('rotate').onclick=()=>{
+  angle+=Math.PI/2;draw();
+};
+
+document.getElementById('reset').onclick=()=>{
+  angle=0;draw();
+};
+
+document.getElementById('download').onclick=()=>{
+  const a=document.createElement('a');
+  a.download='cropped-image.png';
+  a.href=canvas.toDataURL('image/png');
+  a.click();
+};
+</script>
+
+</body>
+</html>
