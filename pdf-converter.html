@@ -3,21 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Universal PDF & Word Converter</title>
+<title>Advanced PDF & Word Converter</title>
 
-<!-- Fonts & Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <!-- Styles -->
 <style>
 :root {
   --primary-color: #4a90e2;
-  --bg-color: #f5f5f5;
+  --bg-color: #ffffff;
   --text-color: #333;
-  --card-bg: #fff;
+  --card-bg: #f9f9f9;
 }
-[data-theme="dark"] {
-  --bg-color: #1e1e1e;
+[data-theme="grey"] {
+  --bg-color: #e0e0e0;
+  --text-color: #222;
+  --card-bg: #f2f2f2;
+}
+[data-theme="black"] {
+  --bg-color: #1c1c1c;
   --text-color: #f5f5f5;
   --card-bg: #2a2a2a;
 }
@@ -32,6 +37,7 @@ header {
   background: var(--primary-color);
   color: #fff;
   text-align: center;
+  position: relative;
 }
 h1 {
   margin: 0;
@@ -44,29 +50,29 @@ h1 {
 }
 .card {
   background: var(--card-bg);
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 input[type=file] {
   display: none;
 }
 label.file-upload {
   display: inline-block;
-  padding: 0.5rem 1rem;
+  padding: 0.7rem 1.2rem;
   background: var(--primary-color);
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   margin-bottom: 1rem;
 }
 button {
   background: var(--primary-color);
   color: #fff;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   margin-top: 0.5rem;
 }
@@ -81,45 +87,54 @@ button:disabled {
 .file-list li {
   margin-bottom: 0.5rem;
 }
-.toggle-theme {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  cursor: pointer;
-  font-size: 1.2rem;
-}
 .progress {
   width: 100%;
   background: #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
   margin-top: 0.5rem;
 }
 .progress-bar {
   width: 0%;
-  height: 10px;
+  height: 12px;
   background: var(--primary-color);
+  transition: width 0.3s;
 }
-@media (max-width: 600px) {
-  body { font-size: 14px; }
-  button, label.file-upload { width: 100%; text-align: center; }
+.theme-selector {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+@media (max-width:600px){
+  .container{padding:0.5rem;}
+  button, label.file-upload{width:100%; text-align:center;}
 }
 </style>
 </head>
-<body data-theme="light">
+<body data-theme="white">
 <header>
-  <h1>Universal PDF & Word Converter</h1>
-  <i class="fas fa-moon toggle-theme" id="themeToggle"></i>
+  <h1>Advanced PDF & Word Converter</h1>
+  <select class="theme-selector" id="themeSelect">
+    <option value="white">White</option>
+    <option value="grey">Grey</option>
+    <option value="black">Black</option>
+  </select>
 </header>
 
 <div class="container">
-  <!-- File Upload Section -->
+  <!-- Upload Section (Post Card Style) -->
   <div class="card">
     <h2>Upload Files</h2>
-    <label class="file-upload">
-      <i class="fas fa-upload"></i> Select Files
+    <label class="file-upload"><i class="fas fa-upload"></i> Select Files
       <input type="file" id="fileInput" multiple>
     </label>
+    <div class="progress" id="uploadProgress" style="display:none;">
+      <div class="progress-bar" id="uploadBar"></div>
+    </div>
     <ul id="fileList" class="file-list"></ul>
   </div>
 
@@ -135,8 +150,8 @@ button:disabled {
       <option value="splitPdf">Split PDF</option>
     </select>
     <button id="convertBtn">Convert</button>
-    <div class="progress" id="progress" style="display:none;">
-      <div class="progress-bar" id="progressBar"></div>
+    <div class="progress" id="convertProgress" style="display:none;">
+      <div class="progress-bar" id="convertBar"></div>
     </div>
   </div>
 
@@ -153,45 +168,62 @@ button:disabled {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.3.2/docx.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.212/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.2.1/dist/tesseract.min.js"></script>
 
 <!-- Script -->
 <script>
-const themeToggle = document.getElementById('themeToggle');
-themeToggle.addEventListener('click', () => {
-  const body = document.body;
-  body.dataset.theme = body.dataset.theme === 'light' ? 'dark' : 'light';
+// Theme selection
+const themeSelect = document.getElementById('themeSelect');
+themeSelect.addEventListener('change', ()=> {
+  document.body.dataset.theme = themeSelect.value;
 });
 
 // File handling
 let files = [];
 const fileInput = document.getElementById('fileInput');
 const fileList = document.getElementById('fileList');
+const uploadProgress = document.getElementById('uploadProgress');
+const uploadBar = document.getElementById('uploadBar');
+
 fileInput.addEventListener('change', (e) => {
-  files = Array.from(e.target.files);
+  const selectedFiles = Array.from(e.target.files);
+  files = files.concat(selectedFiles);
   displayFiles();
+  simulateUploadProgress(selectedFiles.length);
 });
-function displayFiles() {
-  fileList.innerHTML = '';
-  files.forEach((file, idx) => {
-    const li = document.createElement('li');
-    li.textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+
+function displayFiles(){
+  fileList.innerHTML='';
+  files.forEach((file,idx)=>{
+    const li=document.createElement('li');
+    li.textContent=file.name+' ('+Math.round(file.size/1024)+' KB)';
     fileList.appendChild(li);
   });
+}
+
+function simulateUploadProgress(count){
+  uploadProgress.style.display='block';
+  let progress=0;
+  const step=100/count;
+  const interval=setInterval(()=>{
+    progress+=step;
+    if(progress>=100){progress=100; clearInterval(interval);}
+    uploadBar.style.width=progress+'%';
+    if(progress===100) setTimeout(()=>{uploadProgress.style.display='none'; uploadBar.style.width='0%';},500);
+  },200);
 }
 
 // Conversion
 const convertBtn = document.getElementById('convertBtn');
 const convertType = document.getElementById('convertType');
 const downloadList = document.getElementById('downloadList');
-const progressBar = document.getElementById('progressBar');
-const progress = document.getElementById('progress');
+const convertProgress = document.getElementById('convertProgress');
+const convertBar = document.getElementById('convertBar');
 
-convertBtn.addEventListener('click', async () => {
-  if(files.length===0){ alert('Select files first!'); return;}
-  downloadList.innerHTML = '';
-  progress.style.display = 'block';
-  progressBar.style.width = '0%';
+convertBtn.addEventListener('click', async ()=>{
+  if(files.length===0){alert('Select files first!'); return;}
+  downloadList.innerHTML='';
+  convertProgress.style.display='block';
+  convertBar.style.width='0%';
   const step = 100/files.length;
   for(let i=0;i<files.length;i++){
     const file = files[i];
@@ -212,39 +244,35 @@ convertBtn.addEventListener('click', async () => {
           converted = await splitPdf(file); break;
       }
       if(converted){
-        if(Array.isArray(converted)){
-          converted.forEach(addDownload);
-        } else addDownload(converted);
+        if(Array.isArray(converted)) converted.forEach(addDownload);
+        else addDownload(converted);
       }
     }catch(err){console.error(err);}
-    progressBar.style.width = ((i+1)*step) + '%';
+    convertBar.style.width=((i+1)*step)+'%';
   }
-  progress.style.display = 'none';
+  setTimeout(()=>{convertProgress.style.display='none'; convertBar.style.width='0%';},500);
 });
 
 // Conversion Functions
 async function wordToPdf(file){
   const arrayBuffer = await file.arrayBuffer();
   const doc = await docx.Document.load(arrayBuffer);
-  const htmlContent = doc.getFullText(); // simple text
+  const htmlContent = doc.getFullText();
   const pdfBlob = await html2pdf().from(htmlContent).outputPdf('blob');
-  pdfBlob.name = file.name.replace(/\.\w+$/,'') + '.pdf';
+  pdfBlob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
   return pdfBlob;
 }
-
 async function textToPdf(file){
-  const text = await file.text();
+  const text=await file.text();
   const pdfBlob = await html2pdf().from(text).outputPdf('blob');
-  pdfBlob.name = file.name.replace(/\.\w+$/,'') + '.pdf';
+  pdfBlob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
   return pdfBlob;
 }
-
 async function imageToPdf(file){
   const pdfBlob = await html2pdf().from(URL.createObjectURL(file)).outputPdf('blob');
-  pdfBlob.name = file.name.replace(/\.\w+$/,'') + '.pdf';
+  pdfBlob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
   return pdfBlob;
 }
-
 async function pdfToTextWord(file){
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
@@ -255,50 +283,45 @@ async function pdfToTextWord(file){
     const strings = content.items.map(item=>item.str);
     fullText += strings.join(' ') + '\n\n';
   }
-  // Convert to simple Word
   const { Document, Packer, Paragraph, TextRun } = docx;
   const doc = new Document();
   doc.addSection({children:[new Paragraph({children:[new TextRun(fullText)]})]});
   const blob = await Packer.toBlob(doc);
-  blob.name = file.name.replace(/\.\w+$/,'') + '.docx';
+  blob.name=file.name.replace(/\.\w+$/,'')+'.docx';
   return blob;
 }
-
 async function mergePdf(fileArray){
   const mergedPdf = await PDFLib.PDFDocument.create();
   for(const f of fileArray){
-    const data = await f.arrayBuffer();
-    const pdf = await PDFLib.PDFDocument.load(data);
-    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-    copiedPages.forEach(page => mergedPdf.addPage(page));
+    const data=await f.arrayBuffer();
+    const pdf=await PDFLib.PDFDocument.load(data);
+    const copiedPages=await mergedPdf.copyPages(pdf,pdf.getPageIndices());
+    copiedPages.forEach(page=>mergedPdf.addPage(page));
   }
-  const mergedBlob = new Blob([await mergedPdf.save()], {type:'application/pdf'});
-  mergedBlob.name = 'merged.pdf';
+  const mergedBlob=new Blob([await mergedPdf.save()],{type:'application/pdf'});
+  mergedBlob.name='merged.pdf';
   return mergedBlob;
 }
-
 async function splitPdf(file){
-  const data = await file.arrayBuffer();
-  const pdf = await PDFLib.PDFDocument.load(data);
-  const blobs = [];
+  const data=await file.arrayBuffer();
+  const pdf=await PDFLib.PDFDocument.load(data);
+  const blobs=[];
   for(let i=0;i<pdf.getPageCount();i++){
-    const newPdf = await PDFLib.PDFDocument.create();
-    const [copied] = await newPdf.copyPages(pdf,[i]);
+    const newPdf=await PDFLib.PDFDocument.create();
+    const [copied]=await newPdf.copyPages(pdf,[i]);
     newPdf.addPage(copied);
-    const blob = new Blob([await newPdf.save()],{type:'application/pdf'});
-    blob.name = file.name.replace(/\.\w+$/,'')+'_page'+(i+1)+'.pdf';
+    const blob=new Blob([await newPdf.save()],{type:'application/pdf'});
+    blob.name=file.name.replace(/\.\w+$/,'')+'_page'+(i+1)+'.pdf';
     blobs.push(blob);
   }
   return blobs;
 }
-
-// Add to download list
 function addDownload(blob){
-  const li = document.createElement('li');
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = blob.name;
-  a.textContent = 'Download ' + blob.name;
+  const li=document.createElement('li');
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=blob.name;
+  a.textContent='Download '+blob.name;
   li.appendChild(a);
   downloadList.appendChild(li);
 }
