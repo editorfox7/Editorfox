@@ -13,7 +13,6 @@
   <link rel="icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* Reset & Base */
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: 'Inter', sans-serif; background:#0f0f0f; color:#f5f5f5; line-height:1.6; }
     a { color: inherit; text-decoration: none; }
@@ -22,14 +21,9 @@
     h2 { font-size:2rem; margin-bottom:0.75rem; }
     h3 { font-size:1.5rem; margin-bottom:0.5rem; }
 
-    /* Container */
     .container { max-width:1200px; margin:0 auto; padding:2rem; }
-
-    /* Header */
     header { text-align:center; padding:2rem 0; }
     header h1 { color:#fff; }
-
-    /* PDF Converter Card */
     .converter-card { 
       background: rgba(255,255,255,0.05); 
       backdrop-filter: blur(12px); 
@@ -39,8 +33,6 @@
       transition: transform 0.3s ease;
     }
     .converter-card:hover { transform: translateY(-5px); }
-
-    /* Upload Area */
     .upload-area { 
       border: 2px dashed #fff; 
       border-radius:12px; 
@@ -51,12 +43,8 @@
       transition: background 0.3s ease, box-shadow 0.3s ease;
     }
     .upload-area.dragover { background: rgba(255,255,255,0.1); box-shadow:0 0 20px #fff; }
-
     .upload-area p { font-size:1.1rem; }
-
     input[type="file"] { display:none; }
-
-    /* File List */
     .file-list { list-style:none; margin-top:1rem; }
     .file-item { 
       display:flex; 
@@ -70,8 +58,6 @@
       transition: background 0.3s ease;
     }
     .file-item:hover { background: rgba(255,255,255,0.1); }
-
-    /* Buttons */
     .btn { 
       background: linear-gradient(135deg,#ff4d6d,#ff6a3d); 
       border:none; 
@@ -83,19 +69,11 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .btn:hover { transform: scale(1.05); box-shadow:0 6px 18px rgba(255,77,109,0.5); }
-
-    /* Progress Bar */
     .progress-container { width:100%; background:#222; border-radius:8px; overflow:hidden; margin-top:0.5rem; }
     .progress-bar { height:8px; width:0%; background: linear-gradient(90deg,#ff4d6d,#ff6a3d); transition: width 0.3s ease; }
-
-    /* Toasts */
     .toast { position: fixed; bottom:2rem; right:2rem; background: rgba(255,255,255,0.1); padding:1rem 1.5rem; border-radius:8px; backdrop-filter: blur(8px); box-shadow:0 4px 12px rgba(0,0,0,0.5); opacity:0; transform: translateY(20px); transition: all 0.3s ease; }
     .toast.show { opacity:1; transform: translateY(0); }
-
-    /* Footer */
     footer { text-align:center; padding:2rem 0; font-size:0.9rem; color:#aaa; }
-
-    /* Responsive */
     @media (max-width:768px){
       .converter-card { padding:1.5rem; }
       h1 { font-size:2rem; }
@@ -134,7 +112,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.0.2/docx.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
   <script>
-    // File Upload & Drag & Drop
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
     const fileSelectBtn = document.getElementById('fileSelectBtn');
@@ -149,18 +126,9 @@
 
     fileInput.addEventListener('change', e => handleFiles(e.target.files));
 
-    uploadArea.addEventListener('dragover', e => {
-      e.preventDefault();
-      uploadArea.classList.add('dragover');
-    });
-
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
     uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-
-    uploadArea.addEventListener('drop', e => {
-      e.preventDefault();
-      uploadArea.classList.remove('dragover');
-      handleFiles(e.dataTransfer.files);
-    });
+    uploadArea.addEventListener('drop', e => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
 
     function handleFiles(selectedFiles){
       for(let file of selectedFiles){
@@ -172,46 +140,48 @@
       }
     }
 
-    // Conversion Logic (Simplified Client-Side Example)
-    async function convertFiles(){
+    async function convertFiles() {
       if(files.length === 0) return;
       convertBtn.disabled = true;
       let completed = 0;
 
-      for(let i=0;i<files.length;i++){
+      for(let i=0; i<files.length; i++){
         const file = files[i];
         const statusEl = document.getElementById(`status-${i}`);
         statusEl.textContent = 'Converting...';
 
         try {
-          if(file.type === "application/pdf"){
-            const pdf = await file.arrayBuffer();
+          if(file.type === "application/pdf" || file.name.endsWith(".pdf")){
             const doc = new window.docx.Document();
-            doc.addSection({ properties:{}, children:[new window.docx.Paragraph({text:'PDF converted content'})] });
+            doc.addSection({
+              properties: {},
+              children: [new window.docx.Paragraph({ text: 'PDF converted content placeholder' })]
+            });
             const blob = await window.docx.Packer.toBlob(doc);
-            saveAs(blob, file.name.replace('.pdf','.docx'));
+            saveAs(blob, file.name.replace('.pdf', '.docx'));
           } else if(file.name.endsWith('.docx')){
-            // Convert Word to PDF
             const pdf = new jspdf.jsPDF();
-            pdf.text('Word converted content',10,10);
-            pdf.save(file.name.replace('.docx','.pdf'));
-          } else if(file.type.startsWith('image/')){
+            pdf.text('Word converted content placeholder', 10, 10);
+            pdf.save(file.name.replace('.docx', '.pdf'));
+          } else if(file.type.startsWith('image/') || /\.(jpg|png)$/i.test(file.name)){
             const pdf = new jspdf.jsPDF();
-            const img = await fileToDataURL(file);
-            pdf.addImage(img,'JPEG',10,10,180,160);
-            pdf.save(file.name.replace(/\.(jpg|png)$/i,'.pdf'));
-          } else if(file.type === "text/plain"){
+            const imgData = await fileToDataURL(file);
+            pdf.addImage(imgData, 'JPEG', 10, 10, 180, 160);
+            pdf.save(file.name.replace(/\.(jpg|png)$/i, '.pdf'));
+          } else if(file.type === "text/plain" || file.name.endsWith('.txt')){
             const pdf = new jspdf.jsPDF();
             const text = await file.text();
-            pdf.text(text,10,10);
-            pdf.save(file.name.replace('.txt','.pdf'));
+            pdf.text(text, 10, 10);
+            pdf.save(file.name.replace('.txt', '.pdf'));
           } else {
             statusEl.textContent = 'Error: Unsupported';
             continue;
           }
+
           statusEl.textContent = 'Completed';
-        } catch(e){
+        } catch (e) {
           statusEl.textContent = 'Error';
+          console.error(e);
         }
 
         completed++;
@@ -219,7 +189,8 @@
       }
 
       toast.classList.add('show');
-      setTimeout(()=>toast.classList.remove('show'),3000);
+      setTimeout(()=>toast.classList.remove('show'), 3000);
+
       convertBtn.disabled = false;
       files = [];
       fileList.innerHTML = '';
@@ -235,13 +206,6 @@
     }
 
     convertBtn.addEventListener('click', convertFiles);
-
-    /* Analytics Hooks (Commented for Integration)
-      // trackEvent('upload', {filesCount: files.length});
-      // trackEvent('conversion_start', {files: files.map(f=>f.name)});
-      // trackEvent('conversion_complete', {filesConverted: files.length});
-      // trackEvent('download', {files: files.map(f=>f.name)});
-    */
   </script>
 
   <!-- SEO ARTICLE -->
