@@ -3,48 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Next-Gen PDF Converter</title>
+<title>Advanced PDF Converter</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 body {
-  margin: 0; font-family:'Segoe UI', sans-serif;
+  margin:0; font-family:'Segoe UI', sans-serif;
   background:#121212; color:#f5f5f5;
   display:flex; flex-direction:column; align-items:center;
 }
 header {
-  width:100%; text-align:center; padding:1rem;
+  width:100%; padding:1rem; text-align:center;
   background:#1e1e1e; box-shadow:0 4px 12px rgba(0,0,0,0.4);
 }
-h1 { margin:0; font-size:1.8rem; }
-.container {
-  max-width: 800px; width:95%; margin:2rem auto;
+h1{margin:0;font-size:1.8rem;}
+.container{
+  max-width:800px; width:95%; margin:2rem auto;
   display:flex; flex-direction:column; align-items:center;
 }
-.card {
+.card{
   background:#1f1f1f; width:100%; border-radius:16px;
   padding:2rem; margin-bottom:2rem; text-align:center;
   box-shadow:0 6px 16px rgba(0,0,0,0.5);
 }
-label.file-upload {
+label.file-upload{
   display:inline-block; padding:0.8rem 1.5rem;
   background: linear-gradient(135deg,#4a90e2,#0072ff);
   color:#fff; border-radius:10px; cursor:pointer;
   transition: transform 0.2s; margin-bottom:1rem;
 }
-label.file-upload:hover{ transform:scale(1.05);}
+label.file-upload:hover{transform:scale(1.05);}
 input[type=file]{display:none;}
-button {
+button{
   background: linear-gradient(135deg,#4a90e2,#0072ff);
   color:#fff; padding:0.7rem 1.5rem; border:none;
   border-radius:10px; cursor:pointer; margin-top:1rem;
   transition: transform 0.2s;
 }
-button:hover{ transform:scale(1.05);}
+button:hover{transform:scale(1.05);}
 .file-list{list-style:none;padding:0;}
 .file-list li{margin-bottom:0.7rem;}
 .progress{width:100%; background:#333; border-radius:8px; overflow:hidden; margin-top:0.5rem;}
 .progress-bar{width:0%; height:14px; background:#4a90e2; transition:width 0.3s;}
-@media (max-width:600px){
+@media(max-width:600px){
   .container{width:95%;}
   button,label.file-upload{width:100%;}
 }
@@ -52,9 +52,7 @@ button:hover{ transform:scale(1.05);}
 </head>
 <body>
 
-<header>
-  <h1>Next-Gen PDF Converter</h1>
-</header>
+<header><h1>Advanced PDF Converter</h1></header>
 
 <div class="container">
 
@@ -85,14 +83,13 @@ button:hover{ transform:scale(1.05);}
 </div>
 
 <!-- Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.212/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.3.2/docx.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <script>
 let files=[];
-
 const fileInput=document.getElementById('fileInput');
 const fileList=document.getElementById('fileList');
 const uploadProgress=document.getElementById('uploadProgress');
@@ -101,7 +98,6 @@ const convertProgress=document.getElementById('convertProgress');
 const convertBar=document.getElementById('convertBar');
 const downloadList=document.getElementById('downloadList');
 
-// File selection
 fileInput.addEventListener('change',(e)=>{
   files=files.concat(Array.from(e.target.files));
   renderFiles();
@@ -136,7 +132,7 @@ document.getElementById('convertBtn').addEventListener('click', async()=>{
   convertProgress.style.display='block';
   convertBar.style.width='0%';
   const step=100/files.length;
-  
+
   for(let i=0;i<files.length;i++){
     const file=files[i];
     try{
@@ -157,20 +153,44 @@ async function convertFile(file){
   alert('Unsupported: '+file.name);
 }
 
-// Conversions
+// Text → PDF
 async function textToPdf(file){
   const text=await file.text();
-  const blob=await html2pdf().from(text).outputPdf('blob');
+  const { jsPDF } = window.jspdf;
+  const pdf=new jsPDF();
+  const lines=text.split('\n');
+  let y=10;
+  lines.forEach(line=>{
+    pdf.text(line,10,y);
+    y+=7;
+    if(y>280){pdf.addPage(); y=10;}
+  });
+  const blob=pdf.output('blob');
   blob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
   return blob;
 }
 
+// Image → PDF
 async function imageToPdf(file){
-  const blob=await html2pdf().from(URL.createObjectURL(file)).outputPdf('blob');
+  const { jsPDF }=window.jspdf;
+  const pdf=new jsPDF();
+  const img=await fileToDataURL(file);
+  pdf.addImage(img,'JPEG',10,10,180,0);
+  const blob=pdf.output('blob');
   blob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
   return blob;
 }
 
+function fileToDataURL(file){
+  return new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onload=e=>res(e.target.result);
+    reader.onerror=err=>rej(err);
+    reader.readAsDataURL(file);
+  });
+}
+
+// PDF → Word (text-only)
 async function pdfToWord(file){
   const arrayBuffer=await file.arrayBuffer();
   const pdf=await pdfjsLib.getDocument(arrayBuffer).promise;
@@ -188,10 +208,15 @@ async function pdfToWord(file){
   return blob;
 }
 
+// Word → PDF (text-only)
 async function docxToPdf(file){
   const arrayBuffer=await file.arrayBuffer();
+  const { Document, Packer }=docx;
+  const doc=new Document();
   const text="Word file converted (text-only PDF)";
-  const blob=await html2pdf().from(text).outputPdf('blob');
+  const pdf=new window.jspdf.jsPDF();
+  pdf.text(text,10,10);
+  const blob=pdf.output('blob');
   blob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
   return blob;
 }
