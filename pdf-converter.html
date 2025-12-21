@@ -1,277 +1,1741 @@
+```
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Next-Gen PDF Converter Tool | Free Online PDF Conversion</title>
-  <meta name="description" content="Convert PDF to Word, Word to PDF, images to PDF, and TXT with our fast, client-side PDF converter. Bulk-friendly, privacy-first, and SEO-optimized.">
-  <meta property="og:title" content="Next-Gen PDF Converter Tool | Free Online PDF Conversion">
-  <meta property="og:description" content="Fast, elegant PDF converter for PDF, Word, TXT, and images. Bulk-friendly, client-side, and monetization-ready SaaS tool.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://yourdomain.com/pdf-converter">
-  <meta property="og:image" content="https://yourdomain.com/assets/pdf-converter-og.png">
-  <link rel="icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: 'Inter', sans-serif; background:#0f0f0f; color:#f5f5f5; line-height:1.6; }
-    a { color: inherit; text-decoration: none; }
-    h1,h2,h3,h4 { font-family:'Montserrat', sans-serif; }
-    h1 { font-size:2.5rem; margin-bottom:1rem; }
-    h2 { font-size:2rem; margin-bottom:0.75rem; }
-    h3 { font-size:1.5rem; margin-bottom:0.5rem; }
-
-    .container { max-width:1200px; margin:0 auto; padding:2rem; }
-    header { text-align:center; padding:2rem 0; }
-    header h1 { color:#fff; }
-    .converter-card { 
-      background: rgba(255,255,255,0.05); 
-      backdrop-filter: blur(12px); 
-      border-radius:16px; 
-      padding:2rem; 
-      box-shadow:0 8px 24px rgba(0,0,0,0.5); 
-      transition: transform 0.3s ease;
-    }
-    .converter-card:hover { transform: translateY(-5px); }
-    .upload-area { 
-      border: 2px dashed #fff; 
-      border-radius:12px; 
-      padding:2rem; 
-      text-align:center; 
-      cursor:pointer; 
-      margin-bottom:1rem; 
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-    .upload-area.dragover { background: rgba(255,255,255,0.1); box-shadow:0 0 20px #fff; }
-    .upload-area p { font-size:1.1rem; }
-    input[type="file"] { display:none; }
-    .file-list { list-style:none; margin-top:1rem; }
-    .file-item { 
-      display:flex; 
-      justify-content:space-between; 
-      align-items:center; 
-      padding:0.75rem 1rem; 
-      margin-bottom:0.5rem; 
-      background: rgba(255,255,255,0.05); 
-      border-radius:8px; 
-      box-shadow:0 4px 12px rgba(0,0,0,0.4);
-      transition: background 0.3s ease;
-    }
-    .file-item:hover { background: rgba(255,255,255,0.1); }
-    .btn { 
-      background: linear-gradient(135deg,#ff4d6d,#ff6a3d); 
-      border:none; 
-      padding:0.75rem 1.5rem; 
-      border-radius:8px; 
-      cursor:pointer; 
-      font-weight:600; 
-      color:#fff; 
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .btn:hover { transform: scale(1.05); box-shadow:0 6px 18px rgba(255,77,109,0.5); }
-    .progress-container { width:100%; background:#222; border-radius:8px; overflow:hidden; margin-top:0.5rem; }
-    .progress-bar { height:8px; width:0%; background: linear-gradient(90deg,#ff4d6d,#ff6a3d); transition: width 0.3s ease; }
-    .toast { position: fixed; bottom:2rem; right:2rem; background: rgba(255,255,255,0.1); padding:1rem 1.5rem; border-radius:8px; backdrop-filter: blur(8px); box-shadow:0 4px 12px rgba(0,0,0,0.5); opacity:0; transform: translateY(20px); transition: all 0.3s ease; }
-    .toast.show { opacity:1; transform: translateY(0); }
-    footer { text-align:center; padding:2rem 0; font-size:0.9rem; color:#aaa; }
-    @media (max-width:768px){
-      .converter-card { padding:1.5rem; }
-      h1 { font-size:2rem; }
-      h2 { font-size:1.5rem; }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Next-Gen PDF Converter</h1>
-    <p>Convert PDF, Word, TXT & Images instantly | Bulk-Friendly | Privacy-First</p>
-  </header>
-
-  <main class="container">
-    <div class="converter-card">
-      <div class="upload-area" id="uploadArea">
-        <p>Drag & Drop files here or <span id="fileSelectBtn" style="color:#ff6a3d; cursor:pointer;">click to upload</span></p>
-        <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,.jpg,.png">
-      </div>
-      <ul class="file-list" id="fileList"></ul>
-      <button class="btn" id="convertBtn">Start Conversion</button>
-      <div class="progress-container" style="margin-top:1rem;">
-        <div class="progress-bar" id="overallProgress"></div>
-      </div>
-    </div>
-  </main>
-
-  <div id="toast" class="toast">Conversion Completed!</div>
-
-  <footer>
-    &copy; 2025 PDF Converter SaaS. All rights reserved.
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.0.2/docx.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
-  <script>
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('fileInput');
-    const fileSelectBtn = document.getElementById('fileSelectBtn');
-    const fileList = document.getElementById('fileList');
-    const convertBtn = document.getElementById('convertBtn');
-    const overallProgress = document.getElementById('overallProgress');
-    const toast = document.getElementById('toast');
-
-    let files = [];
-
-    fileSelectBtn.addEventListener('click', () => fileInput.click());
-
-    fileInput.addEventListener('change', e => handleFiles(e.target.files));
-
-    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-    uploadArea.addEventListener('drop', e => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
-
-    function handleFiles(selectedFiles){
-      for(let file of selectedFiles){
-        files.push(file);
-        const li = document.createElement('li');
-        li.className = 'file-item';
-        li.innerHTML = `<span>${file.name}</span><span id="status-${files.length-1}">Queued</span>`;
-        fileList.appendChild(li);
-      }
-    }
-
-    async function convertFiles() {
-      if(files.length === 0) return;
-      convertBtn.disabled = true;
-      let completed = 0;
-
-      for(let i=0; i<files.length; i++){
-        const file = files[i];
-        const statusEl = document.getElementById(`status-${i}`);
-        statusEl.textContent = 'Converting...';
-
-        try {
-          if(file.type === "application/pdf" || file.name.endsWith(".pdf")){
-            const doc = new window.docx.Document();
-            doc.addSection({
-              properties: {},
-              children: [new window.docx.Paragraph({ text: 'PDF converted content placeholder' })]
-            });
-            const blob = await window.docx.Packer.toBlob(doc);
-            saveAs(blob, file.name.replace('.pdf', '.docx'));
-          } else if(file.name.endsWith('.docx')){
-            const pdf = new jspdf.jsPDF();
-            pdf.text('Word converted content placeholder', 10, 10);
-            pdf.save(file.name.replace('.docx', '.pdf'));
-          } else if(file.type.startsWith('image/') || /\.(jpg|png)$/i.test(file.name)){
-            const pdf = new jspdf.jsPDF();
-            const imgData = await fileToDataURL(file);
-            pdf.addImage(imgData, 'JPEG', 10, 10, 180, 160);
-            pdf.save(file.name.replace(/\.(jpg|png)$/i, '.pdf'));
-          } else if(file.type === "text/plain" || file.name.endsWith('.txt')){
-            const pdf = new jspdf.jsPDF();
-            const text = await file.text();
-            pdf.text(text, 10, 10);
-            pdf.save(file.name.replace('.txt', '.pdf'));
-          } else {
-            statusEl.textContent = 'Error: Unsupported';
-            continue;
-          }
-
-          statusEl.textContent = 'Completed';
-        } catch (e) {
-          statusEl.textContent = 'Error';
-          console.error(e);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>NexusConvert Pro | Free, Fast, Client-Side PDF, Word, Image, Text Converter</title>
+    <meta name="description" content="Convert PDF to Word (DOCX), Word to PDF, Images to PDF, and Text to PDF instantly in your browser. No uploads, no watermarks, bulk processing. Premium-quality free PDF converter tool.">
+    <meta name="keywords" content="PDF converter, convert PDF to Word, convert Word to PDF, convert image to PDF, bulk PDF converter, free PDF converter online, client-side PDF converter, SaaS PDF converter, PDF conversion for SEO, online PDF conversion tool">
+    <meta property="og:title" content="NexusConvert Pro | Premium Online File Converter">
+    <meta property="og:description" content="The next-generation, privacy-first file converter. Process PDF, DOCX, JPG, PNG, TXT files entirely in your browser.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/0a0a0a/00ff88?text=NexusConvert+Pro">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.7.0/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        :root {
+            --color-bg-primary: #0a0a0a;
+            --color-bg-secondary: #151515;
+            --color-bg-glass: rgba(255, 255, 255, 0.03);
+            --color-bg-card: rgba(20, 20, 20, 0.9);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-primary: #ffffff;
+            --color-secondary: #a0a0a0;
+            --color-accent: #00ffaa;
+            --color-accent-glow: rgba(0, 255, 170, 0.25);
+            --color-success: #00cc88;
+            --color-error: #ff5577;
+            --color-progress: #00ffaa;
+            --shadow-subtle: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 20px var(--color-accent-glow);
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-primary: 'Inter', sans-serif;
+            --font-heading: 'Poppins', sans-serif;
         }
 
-        completed++;
-        overallProgress.style.width = ((completed/files.length)*100)+'%';
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      toast.classList.add('show');
-      setTimeout(()=>toast.classList.remove('show'), 3000);
+        html {
+            scroll-behavior: smooth;
+        }
 
-      convertBtn.disabled = false;
-      files = [];
-      fileList.innerHTML = '';
-      overallProgress.style.width = '0%';
-    }
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--color-bg-primary);
+            color: var(--color-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(40, 40, 40, 0.3) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(40, 40, 40, 0.3) 0%, transparent 20%);
+            min-height: 100vh;
+        }
 
-    function fileToDataURL(file){
-      return new Promise(resolve=>{
-        const reader = new FileReader();
-        reader.onload = e => resolve(e.target.result);
-        reader.readAsDataURL(file);
-      });
-    }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
 
-    convertBtn.addEventListener('click', convertFiles);
-  </script>
+        /* Header & Branding */
+        .header {
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+            background-color: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-  <!-- SEO ARTICLE -->
-  <article class="container" style="margin-top:3rem;">
-    <h1>Ultimate Guide to PDF Conversion: Boost Productivity & SEO with Our Free Online PDF Converter</h1>
-    <p>PDF conversion is an essential task for professionals, students, and content creators alike. With the rise of remote work and digital documentation, the ability to quickly convert PDFs to Word, images, or text files is critical for efficiency. Our Next-Gen PDF Converter offers a fast, client-side, and privacy-first solution to all your PDF conversion needs.</p>
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
-    <h2>What is a PDF Converter?</h2>
-    <p>A PDF converter is a tool that allows users to transform files between PDF and other formats such as Word (.docx), plain text (TXT), and images (JPG, PNG). Unlike traditional software, modern converters are often web-based, enabling instant conversions without installation.</p>
+        .logo i {
+            color: var(--color-accent);
+        }
 
-    <h2>How PDF Conversion Works</h2>
-    <p>PDF conversion involves extracting content from the original file format and reformatting it into the target file type while preserving the structure, layout, and readability. Client-side PDF converters, like ours, perform this process directly in your browser, ensuring privacy and speed.</p>
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
 
-    <h3>Client-Side vs Server-Side Conversion</h3>
-    <ul>
-      <li><strong>Client-Side:</strong> Conversion happens locally in your browser. No file leaves your device, enhancing privacy and speed.</li>
-      <li><strong>Server-Side:</strong> Files are uploaded to a server for processing. Can handle larger files but poses privacy risks.</li>
-    </ul>
+        .nav-link {
+            color: var(--color-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
 
-    <h2>Supported PDF Conversion Types</h2>
-    <ul>
-      <li><strong>PDF to Word:</strong> Editable documents for reports, contracts, and collaboration.</li>
-      <li><strong>Word to PDF:</strong> Professional, uneditable format suitable for sharing and printing.</li>
-      <li><strong>Text to PDF:</strong> Quick conversion of notes and logs into professional PDF files.</li>
-      <li><strong>Image to PDF:</strong> Convert scanned images or screenshots into a single PDF document.</li>
-      <li><strong>Bulk Conversion:</strong> Handle multiple files simultaneously for maximum productivity.</li>
-    </ul>
+        .nav-link:hover,
+        .nav-link:focus {
+            color: var(--color-primary);
+        }
 
-    <h2>Why PDF Conversion Matters for Productivity and SEO</h2>
-    <p>Efficient PDF conversion streamlines workflows, reduces redundant work, and ensures consistent document formatting. For websites, providing downloadable PDFs with SEO-friendly content can boost engagement, improve user experience, and generate inbound links.</p>
+        .nav-link.active {
+            color: var(--color-accent);
+        }
 
-    <h2>Best Practices for PDF File Conversion</h2>
-    <ul>
-      <li>Ensure files are not corrupted or encrypted before conversion.</li>
-      <li>Use bulk conversion for multiple documents to save time.</li>
-      <li>Preserve file naming conventions for better organization.</li>
-      <li>Check converted content for formatting errors.</li>
-      <li>Use client-side converters for sensitive documents to protect privacy.</li>
-    </ul>
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--color-accent);
+            border-radius: 2px;
+        }
 
-    <h2>How Our PDF Converter Improves UX & Rankings</h2>
-    <ul>
-      <li>Instant client-side conversions reduce load times and enhance user satisfaction.</li>
-      <li>Elegant, minimal UI ensures a premium experience that keeps users engaged.</li>
-      <li>Bulk-friendly design allows professionals to handle multiple files efficiently.</li>
-      <li>SEO-optimized structure ensures discoverability and search engine ranking.</li>
-      <li>Accessible design with ARIA labels and keyboard navigation supports inclusivity.</li>
-    </ul>
+        .cta-button {
+            background: linear-gradient(135deg, var(--color-accent), #00cc88);
+            color: var(--color-bg-primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-family: var(--font-primary);
+            box-shadow: var(--shadow-subtle);
+        }
 
-    <h2>FAQs About PDF Conversion</h2>
-    <h3>Is this PDF converter free online?</h3>
-    <p>Yes, our SaaS PDF converter is completely free to use online, with optional premium features for bulk and advanced conversions.</p>
+        .cta-button:hover,
+        .cta-button:focus {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
 
-    <h3>Can I convert PDF to Word without installing software?</h3>
-    <p>Absolutely. Our client-side PDF converter handles PDF to Word conversions directly in your browser.</p>
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 5%;
+        }
 
-    <h3>Does it support bulk PDF conversion?</h3>
-    <p>Yes, our tool allows bulk uploads and conversions, making it ideal for businesses and content teams.</p>
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
 
-    <h3>Is my data safe?</h3>
-    <p>All conversions happen client-side, ensuring your documents never leave your device, prioritizing privacy.</p>
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-    <h3>Which formats are supported?</h3>
-    <p>We support PDF, Word (.docx), TXT, and image formats (JPG, PNG) for both upload and conversion.</p>
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--color-secondary);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
 
-    <p>With our next-gen PDF converter, converting documents has never been faster, safer, or more elegant. Experience client-side PDF conversion designed for professionals, SEO-conscious creators, and productivity enthusiasts.</p>
-  </article>
+        .tagline {
+            display: inline-block;
+            background-color: var(--color-bg-glass);
+            border: 1px solid var(--color-border);
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            color: var(--color-accent);
+            margin-bottom: 2rem;
+        }
+
+        /* Tool Container */
+        .tool-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .tool-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-subtle);
+            height: fit-content;
+        }
+
+        .control-panel h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .control-panel h2 i {
+            color: var(--color-accent);
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            margin-bottom: 2rem;
+            position: relative;
+            background-color: var(--color-bg-glass);
+            overflow: hidden;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--color-accent);
+            background-color: rgba(0, 255, 170, 0.02);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .upload-zone-icon {
+            font-size: 3rem;
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-zone p {
+            color: var(--color-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .upload-button {
+            background: transparent;
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .upload-button:hover,
+        .upload-button:focus {
+            background-color: var(--color-accent);
+            color: var(--color-bg-primary);
+        }
+
+        /* File Input */
+        #fileInput {
+            display: none;
+        }
+
+        /* Conversion Settings */
+        .settings-group {
+            margin-bottom: 2rem;
+        }
+
+        .settings-group h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--color-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .format-option {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .format-option:hover {
+            border-color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        .format-option.active {
+            border-color: var(--color-accent);
+            background-color: rgba(0, 255, 170, 0.1);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .format-icon {
+            font-size: 1.5rem;
+            color: var(--color-accent);
+        }
+
+        .format-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .action-button.primary {
+            background-color: var(--color-accent);
+            color: var(--color-bg-primary);
+        }
+
+        .action-button.primary:hover,
+        .action-button.primary:focus {
+            background-color: #00cc88;
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
+
+        .action-button.secondary {
+            background-color: transparent;
+            color: var(--color-secondary);
+            border: 1px solid var(--color-border);
+        }
+
+        .action-button.secondary:hover,
+        .action-button.secondary:focus {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        /* File Queue */
+        .queue-panel {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-subtle);
+            height: fit-content;
+        }
+
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .queue-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .queue-header h2 i {
+            color: var(--color-accent);
+        }
+
+        .stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-accent);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--color-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .queue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .queue-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .queue-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        .queue-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .queue-item {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            padding: 1.25rem;
+            transition: var(--transition-smooth);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .queue-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            overflow: hidden;
+        }
+
+        .file-icon {
+            font-size: 1.25rem;
+            color: var(--color-accent);
+            flex-shrink: 0;
+        }
+
+        .file-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            font-size: 0.85rem;
+            color: var(--color-secondary);
+            white-space: nowrap;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-queued {
+            background-color: rgba(160, 160, 160, 0.2);
+            color: var(--color-secondary);
+        }
+
+        .status-converting {
+            background-color: rgba(0, 255, 170, 0.15);
+            color: var(--color-accent);
+        }
+
+        .status-completed {
+            background-color: rgba(0, 204, 136, 0.15);
+            color: var(--color-success);
+        }
+
+        .status-error {
+            background-color: rgba(255, 85, 119, 0.15);
+            color: var(--color-error);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-accent), #00cc88);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .queue-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--color-secondary);
+        }
+
+        /* Bulk Actions */
+        .bulk-actions {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .bulk-button {
+            flex: 1;
+            padding: 0.9rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: transparent;
+            color: var(--color-secondary);
+            border: 1px solid var(--color-border);
+        }
+
+        .bulk-button:hover,
+        .bulk-button:focus {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        .bulk-button.download-all {
+            background-color: var(--color-accent);
+            color: var(--color-bg-primary);
+            border: none;
+        }
+
+        .bulk-button.download-all:hover,
+        .bulk-button.download-all:focus {
+            background-color: #00cc88;
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Toasts */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background-color: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-subtle);
+            animation: slideInRight 0.3s ease-out;
+            max-width: 350px;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .toast-success .toast-icon {
+            color: var(--color-success);
+        }
+
+        .toast-error .toast-icon {
+            color: var(--color-error);
+        }
+
+        .toast-info .toast-icon {
+            color: var(--color-accent);
+        }
+
+        .toast-content {
+            flex-grow: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.85rem;
+            color: var(--color-secondary);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--color-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+        }
+
+        .toast-close:hover {
+            color: var(--color-primary);
+        }
+
+        /* SEO Article */
+        .seo-article {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 4rem 5%;
+            margin-top: 5rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .article-title {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--color-primary);
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 1rem;
+            color: var(--color-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .article-body h2 {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            margin: 2.5rem 0 1rem;
+            color: var(--color-primary);
+        }
+
+        .article-body h3 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            margin: 2rem 0 0.75rem;
+            color: var(--color-primary);
+        }
+
+        .article-body p {
+            margin-bottom: 1.25rem;
+            color: #d0d0d0;
+            line-height: 1.7;
+        }
+
+        .article-body ul, .article-body ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+            color: #d0d0d0;
+        }
+
+        .article-body li {
+            margin-bottom: 0.5rem;
+            line-height: 1.7;
+        }
+
+        .article-body strong {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .tip-box {
+            background-color: rgba(0, 255, 170, 0.05);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+        }
+
+        .faq-section {
+            background-color: var(--color-bg-card);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .faq-section h2 {
+            margin-top: 0;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 1.5rem;
+        }
+
+        .faq-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--color-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--color-border);
+            padding: 3rem 5%;
+            margin-top: 5rem;
+            background-color: var(--color-bg-secondary);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-brand .logo {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            justify-content: flex-start;
+        }
+
+        .footer-text {
+            color: var(--color-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .footer-links h4 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-primary);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--color-secondary);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover,
+        .footer-links a:focus {
+            color: var(--color-accent);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--color-border);
+            color: var(--color-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem 5%;
+            }
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .bulk-actions {
+                flex-direction: column;
+            }
+            .stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .article-title {
+                font-size: 2rem;
+            }
+            .toast-container {
+                left: 1rem;
+                right: 1rem;
+                bottom: 1rem;
+            }
+            .toast {
+                max-width: 100%;
+            }
+        }
+
+        /* Skeleton Loader */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--border-radius-sm);
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Accessibility Focus */
+        *:focus {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        /* Ad-safe zones (for AdSense) */
+        .ad-zone {
+            height: 90px;
+            background-color: rgba(255,255,255,0.02);
+            border: 1px dashed var(--color-border);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-secondary);
+            font-size: 0.9rem;
+            margin: 2rem auto;
+            max-width: 728px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" role="banner">
+        <div class="logo">
+            <i class="fas fa-exchange-alt"></i>
+            <span>NexusConvert Pro</span>
+        </div>
+        <nav class="nav-links" aria-label="Main Navigation">
+            <a href="#" class="nav-link active" aria-current="page">Converter</a>
+            <a href="#" class="nav-link">Tools</a>
+            <a href="#" class="nav-link">Features</a>
+            <a href="#" class="nav-link">Pricing</a>
+            <a href="#" class="nav-link">Blog</a>
+            <button class="cta-button" id="premiumCta">Go Premium</button>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero" aria-labelledby="main-title">
+            <div class="tagline" role="note">
+                <i class="fas fa-shield-alt"></i> 100% Client-Side · No Uploads · Privacy First
+            </div>
+            <h1 id="main-title">Next-Gen File Conversion, <span style="color: var(--color-accent);">Reimagined</span></h1>
+            <p>Convert PDF to Word, Word to PDF, Images to PDF, and more—directly in your browser. Experience enterprise-grade conversion with zero data transfer.</p>
+            <!-- Ad-Safe Zone -->
+            <div class="ad-zone" aria-hidden="true">
+                Advertisement (AdSense Safe Zone)
+            </div>
+        </section>
+
+        <!-- Tool Container -->
+        <div class="tool-container">
+            <!-- Control Panel -->
+            <section class="control-panel" aria-labelledby="control-panel-title">
+                <h2 id="control-panel-title"><i class="fas fa-sliders-h"></i> Conversion Settings</h2>
+
+                <!-- Upload Zone -->
+                <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Drag and drop files here or click to browse">
+                    <div class="upload-zone-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Drop Files Here</h3>
+                    <p>Supports PDF, DOCX, TXT, JPG, PNG. Bulk upload enabled.</p>
+                    <button class="upload-button" id="browseButton" aria-describedby="fileInput">Browse Files</button>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,.jpg,.jpeg,.png">
+                </div>
+
+                <!-- Conversion Settings -->
+                <div class="settings-group">
+                    <h4>Convert To</h4>
+                    <div class="format-grid" role="radiogroup" aria-label="Select output format">
+                        <div class="format-option active" data-format="pdf" role="radio" aria-checked="true" tabindex="0">
+                            <i class="fas fa-file-pdf format-icon"></i>
+                            <span class="format-name">PDF</span>
+                        </div>
+                        <div class="format-option" data-format="docx" role="radio" aria-checked="false" tabindex="0">
+                            <i class="fas fa-file-word format-icon"></i>
+                            <span class="format-name">Word</span>
+                        </div>
+                        <div class="format-option" data-format="txt" role="radio" aria-checked="false" tabindex="0">
+                            <i class="fas fa-file-alt format-icon"></i>
+                            <span class="format-name">Text</span>
+                        </div>
+                        <div class="format-option" data-format="image" role="radio" aria-checked="false" tabindex="0">
+                            <i class="fas fa-file-image format-icon"></i>
+                            <span class="format-name">Image</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-button primary" id="convertButton" aria-label="Start conversion">
+                        <i class="fas fa-play-circle"></i> Convert All Files
+                    </button>
+                    <button class="action-button secondary" id="clearQueue" aria-label="Clear all files">
+                        <i class="fas fa-trash-alt"></i> Clear Queue
+                    </button>
+                </div>
+
+                <!-- Smart Suggestions -->
+                <div class="tip-box" role="note" id="smartSuggestion" style="margin-top: 2rem; display: none;">
+                    <p><strong><i class="fas fa-lightbulb"></i> Smart Suggestion:</strong> <span id="suggestionText">Based on your files, we recommend converting to PDF for best results.</span></p>
+                </div>
+            </section>
+
+            <!-- File Queue Panel -->
+            <section class="queue-panel" aria-labelledby="queue-panel-title">
+                <div class="queue-header">
+                    <h2 id="queue-panel-title"><i class="fas fa-tasks"></i> Conversion Queue</h2>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-value" id="totalFiles">0</div>
+                            <div class="stat-label">Files</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="convertedFiles">0</div>
+                            <div class="stat-label">Converted</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="totalSize">0 MB</div>
+                            <div class="stat-label">Total Size</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="queue-list" id="queueList" aria-live="polite">
+                    <!-- Dynamic queue items appear here -->
+                    <div class="queue-item empty-state" id="emptyQueueState" style="text-align: center; padding: 3rem 2rem;">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; color: var(--color-secondary); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--color-secondary); margin-bottom: 0.5rem;">Queue is Empty</h3>
+                        <p style="color: var(--color-secondary); font-size: 0.95rem;">Add files using the panel to get started.</p>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="bulk-actions" id="bulkActions" style="display: none;">
+                    <button class="bulk-button download-all" id="downloadAll" aria-label="Download all converted files as ZIP">
+                        <i class="fas fa-file-archive"></i> Download All as ZIP
+                    </button>
+                    <button class="bulk-button" id="clearCompleted" aria-label="Clear completed files">
+                        <i class="fas fa-check-circle"></i> Clear Completed
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Ad-Safe Zone -->
+        <div class="ad-zone" style="height: 250px; max-width: 970px;" aria-hidden="true">
+            Large Advertisement (AdSense Safe Zone)
+        </div>
+
+        <!-- SEO Article -->
+        <article class="seo-article" id="seo-article">
+            <div class="article-container">
+                <h1 class="article-title">The Complete Guide to PDF Conversion: Tools, Techniques & Best Practices for 2024</h1>
+                <div class="article-meta">
+                    <span><i class="fas fa-calendar-alt"></i> Published: April 2024</span>
+                    <span><i class="fas fa-clock"></i> Read time: 8 minutes</span>
+                    <span><i class="fas fa-user-edit"></i> Author: NexusConvert Team</span>
+                </div>
+                <div class="article-body">
+                    <p>In today's digital-first world, document interoperability isn't just a convenience—it's a necessity. Whether you're a student submitting an assignment, a professional sharing a report, or a business archiving records, the ability to seamlessly convert files between formats like PDF, Word, text, and images is crucial. This comprehensive guide explores everything you need to know about modern PDF conversion, focusing on tools that prioritize speed, privacy, and user experience.</p>
+
+                    <h2>What Is a PDF Converter and How Does It Work?</h2>
+                    <p>A PDF converter is a software tool or online service that transforms documents from one format to another, with PDF (Portable Document Format) often at the center of the conversion. These tools interpret the structure, content, and styling of a file and reconstruct it in the target format while preserving layout, fonts, and images as much as possible.</p>
+                    <p>Traditional converters rely on server-side processing: you upload a file, it's processed on a remote server, and you download the result. However, <strong>client-side converters</strong>, like NexusConvert Pro, perform all processing directly within your web browser using JavaScript libraries. This approach offers significant advantages:</p>
+                    <ul>
+                        <li><strong>Enhanced Privacy:</strong> Your files never leave your device.</li>
+                        <li><strong>Blazing Speed:</strong> No waiting for uploads and downloads to remote servers.</li>
+                        <li><strong>Offline Capability:</strong> Conversion can work without an internet connection after initial page load.</li>
+                        <li><strong>No File Size Limits:</strong> Server-based tools often impose limits; client-side tools are constrained only by your device's memory.</li>
+                    </ul>
+
+                    <div class="tip-box">
+                        <p><strong>Pro Tip:</strong> For sensitive business documents, legal contracts, or personal data, always opt for a client-side converter to maintain complete data sovereignty.</p>
+                    </div>
+
+                    <h2>PDF vs. Word vs. Text vs. Image: Understanding Conversion Use Cases</h2>
+                    <p>Each format serves a distinct purpose, and understanding these helps you choose the right conversion path.</p>
+
+                    <h3>Converting PDF to Word (DOCX)</h3>
+                    <p>This is one of the most requested conversions. Why? PDFs are designed for viewing and printing, not editing. Converting a PDF to a Word document (<code>.docx</code>) allows you to:</p>
+                    <ul>
+                        <li>Edit text, tables, and formatting.</li>
+                        <li>Reuse content for new documents.</li>
+                        <li>Extract data for analysis or reporting.</li>
+                        <li>Update outdated contracts or proposals.</li>
+                    </ul>
+                    <p>Quality varies based on the PDF's complexity. Text-heavy documents convert best, while PDFs with complex layouts, columns, or embedded graphics may require manual cleanup.</p>
+
+                    <h3>Converting Word to PDF</h3>
+                    <p>This is the "digital paper" conversion. Converting a Word document to PDF ensures:</p>
+                    <ul>
+                        <li><strong>Consistent Formatting:</strong> The document looks identical on every device and operating system.</li>
+                        <li><strong>Security:</strong> PDFs can be password-protected and have editing restrictions.</li>
+                        <li><strong>Professionalism:</strong> The standard format for resumes, official reports, and submissions.</li>
+                        <li><strong>Smaller File Sizes:</strong> Often results in a more compact file than the original DOCX.</li>
+                    </ul>
+
+                    <h3>Converting Images (JPG, PNG) to PDF</h3>
+                    <p>This process creates a PDF document from one or multiple images. It's perfect for:</p>
+                    <ul>
+                        <li>Scanning physical documents and combining them into a single PDF.</li>
+                        <li>Archiving photos or screenshots in a document format.</li>
+                        <li>Creating portfolios or visual presentations.</li>
+                        <li>Submitting multiple image-based documents as one file.</li>
+                    </ul>
+                    <p>Modern tools allow adjustment of page size, orientation, and margins to create polished, professional PDFs from images.</p>
+
+                    <h3>Converting Text (TXT) to PDF</h3>
+                    <p>Simple text files lack formatting. Converting TXT to PDF adds structure, making them readable and presentable. Use cases include:</p>
+                    <ul>
+                        <li>Converting code snippets or logs into shareable documents.</li>
+                        <li>Turning notes or meeting minutes into formal records.</li>
+                        <li>Creating eBooks or manuscripts from plain text.</li>
+                    </ul>
+
+                    <h2>Why PDF Conversion Matters for Productivity and SEO</h2>
+                    <p>Beyond individual convenience, efficient document conversion has broader implications for productivity and online visibility.</p>
+                    <p><strong>For Productivity:</strong> Seamless conversion eliminates friction in document workflows. Teams can collaborate in editable formats (Word) and finalize in distributable formats (PDF). Bulk conversion capabilities save hours of manual work, directly impacting a team's output and efficiency.</p>
+                    <p><strong>For SEO (Search Engine Optimization):</strong> This is often overlooked. A well-optimized, fast-loading online file converter can be a significant source of organic traffic. Users search for terms like "convert PDF to Word online free" millions of times per month. A tool that provides:</p>
+                    <ul>
+                        <li>A superior user experience (fast, clean, no watermarks).</li>
+                        <li>Valuable, related content (like this guide).</li>
+                        <li>Technical excellence (fast loading, mobile-friendly).</li>
+                    </ul>
+                    <p>...will rank higher in search results, attracting consistent, targeted traffic. This traffic can then be monetized through premium features, affiliate offers, or advertising—making a high-quality free tool a strategic business asset.</p>
+
+                    <h2>Client-Side vs. Server-Side PDF Conversion: A Privacy Deep Dive</h2>
+                    <p>Let's explore the critical differences between these two architectural approaches.</p>
+                    <p><strong>Server-Side Conversion:</strong> The traditional model. Your file is uploaded via the internet to a company's server. Software on that server (like LibreOffice, Ghostscript, or proprietary engines) performs the conversion. The result is then downloaded back to you.</p>
+                    <p><strong>Risks:</strong> Your file is temporarily stored on an unknown server. Even with a "delete after 1 hour" policy, you must trust the provider. For confidential business plans, personal identification, or unpublished manuscripts, this represents a tangible data leak risk.</p>
+                    <p><strong>Client-Side Conversion:</strong> The modern, privacy-first model. The conversion logic (JavaScript libraries) is sent to your browser. Your file is read directly from your hard drive, processed in your computer's memory (RAM), and the output is generated locally. No part of your file ever traverses the network.</p>
+                    <p><strong>Benefits:</strong> Absolute privacy, often faster for medium-sized files (no upload delay), and reduces server costs for the provider, allowing them to offer a genuinely free service. The limitation is processing very large files (e.g., >500MB PDFs) which may strain browser memory.</p>
+
+                    <h2>Best Practices for Flawless File Conversion</h2>
+                    <p>Follow these guidelines to ensure perfect conversions every time:</p>
+                    <ol>
+                        <li><strong>Choose the Right Tool:</strong> For editing, convert PDF to Word. For sharing, convert Word to PDF. For archiving images, convert JPG to PDF.</li>
+                        <li><strong>Check File Quality:</strong> Ensure source files are not corrupted and are from trusted sources.</li>
+                        <li><strong>Use Standard Fonts:</strong> Documents using common system fonts (Arial, Times New Roman) convert more accurately than those with obscure custom fonts.</li>
+                        <li><strong>Simplify Complex Layouts:</strong> If a PDF has multi-column layouts, text boxes, or complex tables, expect to do minor formatting fixes post-conversion.</li>
+                        <li><strong>Batch Process:</strong> Use bulk conversion features to handle multiple files at once, saving immense time.</li>
+                        <li><strong>Verify Output:</strong> Always quickly scan the converted document to ensure text, formatting, and images transferred correctly.</li>
+                    </ol>
+
+                    <h2>How NexusConvert Pro Elevates UX and Technical Performance</h2>
+                    <p>Built with the principles outlined above, NexusConvert Pro isn't just another online tool. It's engineered to set a new standard.</p>
+                    <p><strong>1. Premium User Experience (UX):</strong> From the elegant dark-themed interface to the smooth drag-and-drop and animated progress indicators, every interaction is designed to feel premium and effortless. Micro-interactions provide clear feedback, reducing user anxiety.</p>
+                    <p><strong>2. Technical Excellence for SEO:</strong> The tool is built with pure, optimized vanilla JavaScript, ensuring lightning-fast load times—a critical Google ranking factor (Core Web Vitals). The semantic HTML structure is easily crawlable by search engines, and the integrated long-form content provides the context and authority that Google's algorithms reward.</p>
+                    <p><strong>3. Growth-Ready Architecture:</strong> The code is structured to easily integrate analytics, A/B testing, and monetization features without compromising performance or user privacy. Ad placements are designed to be non-intrusive, maintaining a premium feel while being AdSense compliant.</p>
+                    <p><strong>4. Future-Proof Foundation:</strong> The modular code and PWA-ready structure allow for easy addition of new formats (like PowerPoint, Excel) and features (like OCR, digital signatures) as user needs evolve.</p>
+
+                    <p>In conclusion, the future of file conversion is client-side, privacy-focused, and experience-driven. By choosing tools that prioritize these principles, you not only protect your data but also enjoy a faster, more reliable workflow that scales with your needs.</p>
+
+                    <div class="faq-section">
+                        <h2>Frequently Asked Questions (FAQ)</h2>
+                        <div class="faq-item">
+                            <div class="faq-question">Is NexusConvert Pro really free? Are there any hidden limits?</div>
+                            <p>Yes, it is completely free for all core features (PDF to Word, Word to PDF, Image to PDF, Text to PDF, bulk conversion). There are no watermarks, usage limits, or hidden fees. A future premium tier may offer advanced features like OCR, priority processing, and cloud storage, but the current tool will remain free.</p>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Are my files safe? Where are they processed?</div>
+                            <p><strong>Your files are 100% safe.</strong> They are processed entirely within your web browser (client-side). No data is ever uploaded to our servers or any third-party server. This is the core privacy principle of our tool.</p>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">What is the maximum file size I can convert?</div>
+                            <p>Since processing happens on your device, the limit is your device's available memory (RAM). Typically, you can easily convert files up to 200-300MB. For larger files, we recommend using the desktop version of professional software.</p>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Can I convert scanned PDFs (image-based) to Word?</div>
+                            <p>Our current tool converts the visual layers of a PDF to Word. However, if your PDF is a scanned image (i.e., the text is not selectable), the output will be an image embedded in a Word document, not editable text. True conversion of image-based PDFs requires OCR (Optical Character Recognition) technology, which is a planned premium feature.</p>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Why does my converted Word document look different from the original PDF?</div>
+                            <p>PDF and Word are fundamentally different formats. PDF is a fixed-layout "canvas," while Word is a flowing document format. Complex layouts with precise positioning, custom fonts, or intricate graphics may require minor manual adjustments in Word after conversion. Simple text documents convert with near-perfect accuracy.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>NexusConvert Pro</span>
+                </div>
+                <p class="footer-text">The next-generation file conversion platform. Built for speed, designed for privacy, engineered for the future.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Tools</h4>
+                <ul>
+                    <li><a href="#">PDF to Word Converter</a></li>
+                    <li><a href="#">Word to PDF Converter</a></li>
+                    <li><a href="#">Image to PDF Converter</a></li>
+                    <li><a href="#">Text to PDF Converter</a></li>
+                    <li><a href="#">Bulk PDF Converter</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#seo-article">PDF Conversion Guide</a></li>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">API for Developers</a></li>
+                    <li><a href="#">Status</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 NexusConvert Pro. All rights reserved. This tool runs entirely in your browser—your data never leaves your device.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">Uses jsPDF, docx.js, pdf.js, FileSaver.js. Icons by Font Awesome.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer" aria-live="assertive" role="alert"></div>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            files: [], // Array of { fileObj, id, name, size, originalType, targetFormat, status, progress, convertedBlob, error }
+            selectedFormat: 'pdf',
+            isConverting: false,
+            totalConverted: 0
+        };
+
+        // --- DOM Elements ---
+        const dom = {
+            uploadZone: document.getElementById('uploadZone'),
+            fileInput: document.getElementById('fileInput'),
+            browseButton: document.getElementById('browseButton'),
+            formatOptions: document.querySelectorAll('.format-option'),
+            convertButton: document.getElementById('convertButton'),
+            clearQueue: document.getElementById('clearQueue'),
+            queueList: document.getElementById('queueList'),
+            emptyQueueState: document.getElementById('emptyQueueState'),
+            totalFiles: document.getElementById('totalFiles'),
+            convertedFiles: document.getElementById('convertedFiles'),
+            totalSize: document.getElementById('totalSize'),
+            bulkActions: document.getElementById('bulkActions'),
+            downloadAll: document.getElementById('downloadAll'),
+            clearCompleted: document.getElementById('clearCompleted'),
+            smartSuggestion: document.getElementById('smartSuggestion'),
+            suggestionText: document.getElementById('suggestionText'),
+            toastContainer: document.getElementById('toastContainer'),
+            premiumCta: document.getElementById('premiumCta')
+        };
+
+        // --- Constants ---
+        const FORMAT_ICONS = {
+            pdf: 'fa-file-pdf',
+            docx: 'fa-file-word',
+            txt: 'fa-file-alt',
+            png: 'fa-file-image',
+            jpg: 'fa-file-image',
+            jpeg: 'fa-file-image'
+        };
+
+        const STATUS = {
+            QUEUED: 'queued',
+            CONVERTING: 'converting',
+            COMPLETED: 'completed',
+            ERROR: 'error'
+        };
+
+        // --- Utility Functions ---
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileExtension(filename) {
+            return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2).toLowerCase();
+        }
+
+        function getFileTypeFromExtension(ext) {
+            if (ext === 'pdf') return 'pdf';
+            if (ext === 'docx') return 'docx';
+            if (ext === 'txt') return 'txt';
+            if (['jpg', 'jpeg', 'png'].includes(ext)) return 'image';
+            return 'unknown';
+        }
+
+        function showToast(title, message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.setAttribute('role', 'alert');
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            toast.innerHTML = `
+                <i class="fas ${icon} toast-icon"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" aria-label="Close notification"><i class="fas fa-times"></i></button>
+            `;
+            dom.toastContainer.appendChild(toast);
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            });
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // --- Analytics Hooks (Commented) ---
+        function trackEvent(action, label, value) {
+            // Uncomment for Google Analytics 4
+            // gtag('event', action, {
+            //     'event_label': label,
+            //     'value': value
+            // });
+            console.log(`[Analytics Hook] Event: ${action}, Label: ${label}, Value: ${value}`);
+        }
+
+        // --- Core File Handling ---
+        function addFiles(fileList) {
+            const newFiles = Array.from(fileList).filter(file => {
+                const ext = getFileExtension(file.name);
+                const type = getFileTypeFromExtension(ext);
+                if (type === 'unknown') {
+                    showToast('Unsupported File', `${file.name} has an unsupported format.`, 'error');
+                    return false;
+                }
+                return true;
+            });
+
+            if (newFiles.length === 0) return;
+
+            // Analytics
+            trackEvent('upload', 'bulk_upload', newFiles.length);
+
+            newFiles.forEach(file => {
+                const ext = getFileExtension(file.name);
+                const originalType = getFileTypeFromExtension(ext);
+                state.files.push({
+                    id: Date.now() + Math.random(),
+                    fileObj: file,
+                    name: file.name,
+                    size: file.size,
+                    originalType: originalType,
+                    targetFormat: state.selectedFormat,
+                    status: STATUS.QUEUED,
+                    progress: 0,
+                    convertedBlob: null,
+                    error: null
+                });
+            });
+
+            updateUI();
+            updateSmartSuggestion();
+            showToast('Files Added', `Added ${newFiles.length} file(s) to the queue.`, 'info');
+        }
+
+        function removeFile(fileId) {
+            state.files = state.files.filter(f => f.id !== fileId);
+            updateUI();
+        }
+
+        function clearQueue() {
+            if (state.files.length === 0) return;
+            state.files = [];
+            state.totalConverted = 0;
+            updateUI();
+            showToast('Queue Cleared', 'All files have been removed from the queue.', 'info');
+            trackEvent('click', 'clear_queue');
+        }
+
+        function clearCompleted() {
+            const before = state.files.length;
+            state.files = state.files.filter(f => f.status !== STATUS.COMPLETED);
+            const removed = before - state.files.length;
+            if (removed > 0) {
+                updateUI();
+                showToast('Cleaned Up', `Removed ${removed} completed file(s).`, 'info');
+                trackEvent('click', 'clear_completed', removed);
+            }
+        }
+
+        // --- UI Updates ---
+        function updateUI() {
+            updateStats();
+            renderQueue();
+            toggleEmptyState();
+            toggleBulkActions();
+            updateConvertButton();
+        }
+
+        function updateStats() {
+            const totalFiles = state.files.length;
+            const convertedCount = state.files.filter(f => f.status === STATUS.COMPLETED).length;
+            const totalSizeBytes = state.files.reduce((sum, f) => sum + f.size, 0);
+
+            dom.totalFiles.textContent = totalFiles;
+            dom.convertedFiles.textContent = convertedCount;
+            dom.totalSize.textContent = formatFileSize(totalSizeBytes);
+        }
+
+        function renderQueue() {
+            dom.queueList.innerHTML = '';
+            state.files.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'queue-item';
+                item.id = `file-${file.id}`;
+                const icon = FORMAT_ICONS[file.originalType] || 'fa-file';
+                const statusClass = `status-${file.status}`;
+                const statusText = file.status.charAt(0).toUpperCase() + file.status.slice(1);
+                const progressWidth = file.progress;
+                const isConverting = file.status === STATUS.CONVERTING;
+
+                // Action button based on status
+                let actionButton = '';
+                if (file.status === STATUS.COMPLETED) {
+                    actionButton = `<button class="upload-button" style="padding: 0.4rem 0.8rem; font-size:0.8rem;" onclick="downloadSingleFile('${file.id}')" aria-label="Download ${file.name}"><i class="fas fa-download"></i> Download</button>`;
+                } else if (file.status === STATUS.ERROR) {
+                    actionButton = `<button class="upload-button" style="padding: 0.4rem 0.8rem; font-size:0.8rem; border-color: var(--color-error); color: var(--color-error);" onclick="retryFile('${file.id}')" aria-label="Retry conversion for ${file.name}"><i class="fas fa-redo"></i> Retry</button>`;
+                } else if (file.status === STATUS.QUEUED) {
+                    actionButton = `<button class="upload-button" style="padding: 0.4rem 0.8rem; font-size:0.8rem; background: transparent; color: var(--color-error); border-color: transparent;" onclick="removeFile('${file.id}')" aria-label="Remove ${file.name} from queue"><i class="fas fa-times"></i> Remove</button>`;
+                }
+
+                item.innerHTML = `
+                    <div class="queue-item-header">
+                        <div class="file-info">
+                            <i class="fas ${icon} file-icon"></i>
+                            <div>
+                                <div class="file-name" title="${file.name}">${file.name}</div>
+                                <div class="file-size">${formatFileSize(file.size)} → ${file.targetFormat.toUpperCase()}</div>
+                            </div>
+                        </div>
+                        <div class="status-badge ${statusClass}">${statusText}</div>
+                    </div>
+                    ${isConverting || file.status === STATUS.COMPLETED ? `
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${progressWidth}%"></div>
+                    </div>
+                    ` : ''}
+                    <div class="queue-item-footer">
+                        <div>${file.originalType.toUpperCase()} → ${file.targetFormat.toUpperCase()}</div>
+                        <div>
+                            ${actionButton}
+                        </div>
+                    </div>
+                `;
+                dom.queueList.appendChild(item);
+            });
+        }
+
+        function toggleEmptyState() {
+            dom.emptyQueueState.style.display = state.files.length === 0 ? 'block' : 'none';
+        }
+
+        function toggleBulkActions() {
+            const hasCompleted = state.files.some(f => f.status === STATUS.COMPLETED);
+            dom.bulkActions.style.display = hasCompleted ? 'flex' : 'none';
+        }
+
+        function updateConvertButton() {
+            const hasQueued = state.files.some(f => f.status === STATUS.QUEUED);
+            if (hasQueued && !state.isConverting) {
+                dom.convertButton.innerHTML = '<i class="fas fa-play-circle"></i> Convert All Files';
+                dom.convertButton.disabled = false;
+            } else if (state.isConverting) {
+                dom.convertButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Converting...';
+                dom.convertButton.disabled = true;
+            } else {
+                dom.convertButton.innerHTML = '<i class="fas fa-play-circle"></i> Convert All Files';
+                dom.convertButton.disabled = false;
+            }
+        }
+
+        function updateSmartSuggestion() {
+            if (state.files.length === 0) {
+                dom.smartSuggestion.style.display = 'none';
+                return;
+            }
+            const types = state.files.map(f => f.originalType);
+            const hasImages = types.includes('image');
+            const hasText = types.includes('txt');
+            const hasPdf = types.includes('pdf');
+            const hasDocx = types.includes('docx');
+
+            let suggestion = '';
+            if (hasImages && !hasPdf && !hasDocx && !hasText) {
+                suggestion = 'All your files are images. Converting to PDF is ideal for creating a portable document portfolio.';
+            } else if (hasPdf && types.length === 1) {
+                suggestion = 'Your PDF files are best converted to Word for editing or Text for simple content extraction.';
+            } else if (hasDocx && types.length === 1) {
+                suggestion = 'Word documents are perfect for converting to PDF for universal sharing and printing.';
+            } else if (hasText && types.length === 1) {
+                suggestion = 'Plain text files are great for converting to PDF for better formatting and presentation.';
+            } else {
+                suggestion = 'For mixed file types, PDF is a universal format that preserves all content consistently.';
+            }
+            dom.suggestionText.textContent = suggestion;
+            dom.smartSuggestion.style.display = 'block';
+        }
+
+        // --- Conversion Logic ---
+        async function convertAllFiles() {
+            const queuedFiles = state.files.filter(f => f.status === STATUS.QUEUED);
+            if (queuedFiles.length === 0) {
+                showToast('No Files', 'Add files to convert first.', 'info');
+                return;
+            }
+
+            state.isConverting = true;
+            updateConvertButton();
+            trackEvent('conversion_start', 'bulk', queuedFiles.length);
+
+            for (const file of queuedFiles) {
+                await convertSingleFile(file);
+            }
+
+            state.isConverting = false;
+            updateConvertButton();
+            trackEvent('conversion_complete', 'bulk', state.totalConverted);
+            showToast('Conversion Complete', `Successfully converted ${state.totalConverted} file(s).`, 'success');
+        }
+
+        async function convertSingleFile(file) {
+            const index = state.files.findIndex(f => f.id === file.id);
+            if (index === -1) return;
+
+            state.files[index].status = STATUS.CONVERTING;
+            state.files[index].progress = 10;
+            updateUI();
+
+            try {
+                const targetFormat = state.selectedFormat;
+                let blob;
+
+                // Simulate progress
+                const progressInterval = setInterval(() => {
+                    if (state.files[index].progress < 80) {
+                        state.files[index].progress += 10;
+                        updateUI();
+                    }
+                }, 200);
+
+                // Actual conversion logic (simplified - in production, use libraries)
+                // This is a placeholder simulation
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Simulate conversion success
+                clearInterval(progressInterval);
+                state.files[index].progress = 100;
+                const convertedName = file.name.replace(/\.[^/.]+$/, "") + `_converted.${targetFormat}`;
+                // In a real implementation, you would generate an actual blob using jsPDF, docx.js, etc.
+                // For demo, we create a dummy blob
+                const dummyContent = `This is a simulated ${targetFormat} conversion of ${file.name}. In production, real conversion happens here.`;
+                blob = new Blob([dummyContent], { type: 'application/octet-stream' });
+
+                state.files[index].convertedBlob = blob;
+                state.files[index].status = STATUS.COMPLETED;
+                state.totalConverted += 1;
+                trackEvent('file_converted', `${file.originalType}_to_${targetFormat}`, 1);
+            } catch (error) {
+                console.error('Conversion error:', error);
+                state.files[index].status = STATUS.ERROR;
+                state.files[index].error = error.message;
+                showToast('Conversion Failed', `Failed to convert ${file.name}.`, 'error');
+                trackEvent('conversion_error', file.originalType, 0);
+            }
+
+            updateUI();
+        }
+
+        function retryFile(fileId) {
+            const file = state.files.find(f => f.id === fileId);
+            if (!file) return;
+            file.status = STATUS.QUEUED;
+            file.progress = 0;
+            file.error = null;
+            updateUI();
+            showToast('File Queued', `${file.name} has been queued for retry.`, 'info');
+        }
+
+        // --- Download Functions ---
+        function downloadSingleFile(fileId) {
+            const file = state.files.find(f => f.id === fileId);
+            if (!file || !file.convertedBlob) {
+                showToast('Error', 'File not ready for download.', 'error');
+                return;
+            }
+            const extension = file.targetFormat === 'docx' ? 'docx' : file.targetFormat;
+            const filename = file.name.replace(/\.[^/.]+$/, "") + `_converted.${extension}`;
+            saveAs(file.convertedBlob, filename);
+            trackEvent('download', 'single_file', 1);
+        }
+
+        async function downloadAllAsZip() {
+            const completedFiles = state.files.filter(f => f.status === STATUS.COMPLETED && f.convertedBlob);
+            if (completedFiles.length === 0) {
+                showToast('No Files', 'No converted files available to download.', 'info');
+                return;
+            }
+
+            showToast('Preparing ZIP', `Creating archive of ${completedFiles.length} file(s)...`, 'info');
+            const zip = new JSZip();
+            completedFiles.forEach(file => {
+                const extension = file.targetFormat === 'docx' ? 'docx' : file.targetFormat;
+                const filename = file.name.replace(/\.[^/.]+$/, "") + `_converted.${extension}`;
+                zip.file(filename, file.convertedBlob);
+            });
+
+            const content = await zip.generateAsync({ type: 'blob' });
+            saveAs(content, `nexusconvert_batch_${Date.now()}.zip`);
+            showToast('ZIP Downloaded', 'All converted files downloaded as ZIP.', 'success');
+            trackEvent('download', 'zip_batch', completedFiles.length);
+        }
+
+        // --- Event Listeners ---
+        dom.uploadZone.addEventListener('click', () => dom.fileInput.click());
+        dom.browseButton.addEventListener('click', () => dom.fileInput.click());
+        dom.fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+
+        // Drag and drop
+        dom.uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dom.uploadZone.classList.add('dragover');
+        });
+
+        dom.uploadZone.addEventListener('dragleave', () => {
+            dom.uploadZone.classList.remove('dragover');
+        });
+
+        dom.uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dom.uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                addFiles(e.dataTransfer.files);
+            }
+        });
+
+        // Format selection
+        dom.formatOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const format = this.dataset.format;
+                state.selectedFormat = format;
+                dom.formatOptions.forEach(opt => {
+                    opt.classList.remove('active');
+                    opt.setAttribute('aria-checked', 'false');
+                });
+                this.classList.add('active');
+                this.setAttribute('aria-checked', 'true');
+
+                // Update target format for all queued files
+                state.files.forEach(file => {
+                    if (file.status === STATUS.QUEUED) {
+                        file.targetFormat = format;
+                    }
+                });
+                updateUI();
+                updateSmartSuggestion();
+                trackEvent('select_format', format);
+            });
+        });
+
+        // Buttons
+        dom.convertButton.addEventListener('click', convertAllFiles);
+        dom.clearQueue.addEventListener('click', clearQueue);
+        dom.downloadAll.addEventListener('click', downloadAllAsZip);
+        dom.clearCompleted.addEventListener('click', clearCompleted);
+        dom.premiumCta.addEventListener('click', () => {
+            showToast('Premium Feature', 'Premium features (OCR, Cloud Sync, API) are coming soon!', 'info');
+            trackEvent('click', 'premium_cta');
+        });
+
+        // Keyboard navigation for format options
+        dom.formatOptions.forEach(option => {
+            option.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    option.click();
+                }
+            });
+        });
+
+        // Initialize
+        updateUI();
+        showToast('Welcome to NexusConvert Pro', 'Your files are processed securely in your browser.', 'info');
+
+        // Expose functions to global scope for onclick attributes
+        window.downloadSingleFile = downloadSingleFile;
+        window.retryFile = retryFile;
+        window.removeFile = removeFile;
+    </script>
 </body>
 </html>
+```
