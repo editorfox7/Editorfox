@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF & Word Converter</title>
+<title>PDF to Word Converter</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #121212;
-  color: #f5f5f5;
+  background: #f0f8ff;
+  color: #003366;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,15 +20,13 @@ header {
   width: 100%;
   padding: 1rem;
   text-align: center;
-  background: #1e1e1e;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  background: #1e90ff;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-h1 {
-  margin: 0;
-  font-size: 1.8rem;
-}
+h1 { margin: 0; font-size: 1.8rem; }
 .container {
-  max-width: 800px;
+  max-width: 600px;
   width: 95%;
   margin: 2rem auto;
   display: flex;
@@ -36,28 +34,28 @@ h1 {
   align-items: center;
 }
 .card {
-  background: #1f1f1f;
+  background: #fff;
   width: 100%;
   border-radius: 16px;
   padding: 2rem;
   margin-bottom: 2rem;
   text-align: center;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
 label.file-upload {
   display: inline-block;
   padding: 0.8rem 1.5rem;
-  background: linear-gradient(135deg,#4a90e2,#0072ff);
+  background: #1e90ff;
   color: #fff;
   border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.2s;
   margin-bottom: 1rem;
+  transition: transform 0.2s;
 }
 label.file-upload:hover { transform: scale(1.05);}
 input[type=file]{display:none;}
 button {
-  background: linear-gradient(135deg,#4a90e2,#0072ff);
+  background: #1e90ff;
   color: #fff;
   padding: 0.7rem 1.5rem;
   border: none;
@@ -67,10 +65,7 @@ button {
   transition: transform 0.2s;
 }
 button:hover { transform: scale(1.05);}
-.file-list { list-style:none; padding:0; }
-.file-list li { margin-bottom: 0.7rem; }
-.progress { width: 100%; background: #333; border-radius: 8px; overflow:hidden; margin-top: 0.5rem;}
-.progress-bar { width: 0%; height: 14px; background: #4a90e2; transition: width 0.3s; }
+.file-name { margin-top: 0.5rem; font-weight: bold; }
 @media (max-width:600px){
   .container {width:95%;}
   button, label.file-upload {width:100%;}
@@ -78,169 +73,84 @@ button:hover { transform: scale(1.05);}
 </style>
 </head>
 <body>
+
 <header>
-  <h1>Premium PDF & Word Converter</h1>
+  <h1>PDF to Word Converter</h1>
 </header>
 
 <div class="container">
 
   <!-- Upload Section -->
   <div class="card">
-    <h2>Upload Your Files</h2>
-    <label class="file-upload"><i class="fas fa-upload"></i> Select Files
-      <input type="file" id="fileInput" multiple>
+    <h2>Upload PDF</h2>
+    <label class="file-upload"><i class="fas fa-upload"></i> Select PDF
+      <input type="file" id="pdfInput" accept=".pdf">
     </label>
-    <div class="progress" id="uploadProgress" style="display:none;">
-      <div class="progress-bar" id="uploadBar"></div>
-    </div>
-    <ul id="fileList" class="file-list"></ul>
+    <div class="file-name" id="fileName"></div>
   </div>
 
-  <!-- Conversion Section -->
+  <!-- Convert Section -->
   <div class="card">
-    <h2>Convert Files</h2>
-    <button id="convertBtn">Convert</button>
-    <div class="progress" id="convertProgress" style="display:none;">
-      <div class="progress-bar" id="convertBar"></div>
-    </div>
+    <h2>Convert</h2>
+    <button id="convertBtn">Convert to Word</button>
   </div>
 
   <!-- Download Section -->
   <div class="card">
-    <h2>Download Converted Files</h2>
-    <ul id="downloadList" class="file-list"></ul>
+    <h2>Download</h2>
+    <div id="downloadSection"></div>
   </div>
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.212/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.3.2/docx.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <script>
-// Files array
-let files = [];
-const fileInput = document.getElementById('fileInput');
-const fileList = document.getElementById('fileList');
-const uploadProgress = document.getElementById('uploadProgress');
-const uploadBar = document.getElementById('uploadBar');
-const convertProgress = document.getElementById('convertProgress');
-const convertBar = document.getElementById('convertBar');
-const downloadList = document.getElementById('downloadList');
+const pdfInput = document.getElementById('pdfInput');
+const fileNameDisplay = document.getElementById('fileName');
+const convertBtn = document.getElementById('convertBtn');
+const downloadSection = document.getElementById('downloadSection');
 
-fileInput.addEventListener('change', (e) => {
-  const selectedFiles = Array.from(e.target.files);
-  files = files.concat(selectedFiles);
-  displayFiles();
-  simulateUploadProgress(selectedFiles.length);
+let selectedFile = null;
+
+pdfInput.addEventListener('change', (e)=>{
+  selectedFile = e.target.files[0];
+  if(selectedFile) fileNameDisplay.textContent = selectedFile.name;
+  else fileNameDisplay.textContent = '';
 });
 
-function displayFiles(){
-  fileList.innerHTML='';
-  files.forEach(file=>{
-    const li=document.createElement('li');
-    li.textContent=file.name+' ('+Math.round(file.size/1024)+' KB)';
-    fileList.appendChild(li);
-  });
-}
-
-function simulateUploadProgress(count){
-  uploadProgress.style.display='block';
-  let progress=0;
-  const step=100/count;
-  const interval=setInterval(()=>{
-    progress+=step;
-    if(progress>=100){progress=100; clearInterval(interval);}
-    uploadBar.style.width=progress+'%';
-    if(progress===100) setTimeout(()=>{uploadProgress.style.display='none'; uploadBar.style.width='0%';},500);
-  },200);
-}
-
-// Convert
-document.getElementById('convertBtn').addEventListener('click', async()=>{
-  if(files.length===0){ alert('Select files first!'); return;}
-  downloadList.innerHTML='';
-  convertProgress.style.display='block';
-  convertBar.style.width='0%';
-  const step=100/files.length;
-
-  for(let i=0;i<files.length;i++){
-    const file = files[i];
-    try{
-      const converted = await autoConvert(file);
-      if(converted) addDownloadButton(converted);
-    }catch(err){console.error(err);}
-    convertBar.style.width=((i+1)*step)+'%';
+convertBtn.addEventListener('click', async ()=>{
+  if(!selectedFile){
+    alert('Please select a PDF file.');
+    return;
   }
-  setTimeout(()=>{convertProgress.style.display='none'; convertBar.style.width='0%';},500);
+  downloadSection.innerHTML = 'Converting...';
+  try{
+    const arrayBuffer = await selectedFile.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+    let fullText = '';
+    for(let i=1; i<=pdf.numPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item=>item.str).join(' ');
+      fullText += pageText + '\n\n';
+    }
+
+    const { Document, Packer, Paragraph, TextRun } = docx;
+    const doc = new Document();
+    doc.addSection({ children: [ new Paragraph({ children: [ new TextRun(fullText) ] }) ] });
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, selectedFile.name.replace(/\.pdf$/i,'.docx'));
+    downloadSection.innerHTML = '<span style="color:green;">Conversion complete! Download should start automatically.</span>';
+  } catch(err){
+    console.error(err);
+    downloadSection.innerHTML = '<span style="color:red;">Error converting file. Make sure the PDF is text-based.</span>';
+  }
 });
-
-// Auto detect file type
-async function autoConvert(file){
-  const ext = file.name.split('.').pop().toLowerCase();
-  if(['txt'].includes(ext)) return await textToPdf(file);
-  if(['jpg','jpeg','png'].includes(ext)) return await imageToPdf(file);
-  if(['pdf'].includes(ext)) return await pdfToWord(file);
-  if(['docx'].includes(ext)) return await docxToPdf(file);
-  alert('Unsupported file: '+file.name);
-}
-
-// Text → PDF
-async function textToPdf(file){
-  const text = await file.text();
-  const blob = await html2pdf().from(text).outputPdf('blob');
-  blob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
-  return blob;
-}
-
-// Image → PDF
-async function imageToPdf(file){
-  const blob = await html2pdf().from(URL.createObjectURL(file)).outputPdf('blob');
-  blob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
-  return blob;
-}
-
-// PDF → Word (text-only)
-async function pdfToWord(file){
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-  let fullText='';
-  for(let i=1;i<=pdf.numPages;i++){
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    fullText += content.items.map(item=>item.str).join(' ') + '\n\n';
-  }
-  const { Document, Packer, Paragraph, TextRun } = docx;
-  const doc = new Document();
-  doc.addSection({children:[new Paragraph({children:[new TextRun(fullText)]})]});
-  const blob = await Packer.toBlob(doc);
-  blob.name=file.name.replace(/\.\w+$/,'')+'.docx';
-  return blob;
-}
-
-// DOCX → PDF (plain text only)
-async function docxToPdf(file){
-  const arrayBuffer = await file.arrayBuffer();
-  const { Document, Packer } = docx;
-  // Load is limited; we will just convert to text
-  const text = "Word file converted (text-only PDF)";
-  const blob = await html2pdf().from(text).outputPdf('blob');
-  blob.name=file.name.replace(/\.\w+$/,'')+'.pdf';
-  return blob;
-}
-
-// Add download button
-function addDownloadButton(blob){
-  const li=document.createElement('li');
-  const btn=document.createElement('button');
-  btn.textContent='Download '+blob.name;
-  const url=URL.createObjectURL(blob);
-  btn.onclick=()=>{ const a=document.createElement('a'); a.href=url; a.download=blob.name; a.click();}
-  li.appendChild(btn);
-  downloadList.appendChild(li);
-}
 </script>
+
 </body>
 </html>
